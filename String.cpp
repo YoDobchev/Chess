@@ -1,0 +1,81 @@
+#ifndef STRING_CPP
+#define STRING_CPP
+
+#include "String.h"
+#include "Utility.h"
+
+String::String() : data_(nullptr), size_(0), capacity_(0) {}
+
+String::String(const char* s) {
+	if (s) {
+		size_ = Utility::strlen(s);
+		capacity_ = size_;
+		data_ = new char[capacity_ + 1];
+		Utility::strcpy(data_, s);
+	} else {
+		data_ = nullptr;
+		size_ = 0;
+		capacity_ = 0;
+	}
+}
+
+String::~String() { delete[] data_; }
+
+char& String::operator[](size_t index) { return data_[index]; }
+
+const char& String::operator[](size_t index) const { return data_[index]; }
+
+bool String::operator==(const String& other) const { return Utility::strcmp(data_, other.data_) == 0; }
+
+std::ostream& operator<<(std::ostream& os, const String str) {
+	os << str.c_str();
+	return os;
+}
+
+const char* String::c_str() const { return data_ ? data_ : ""; }
+
+size_t String::size() const { return size_; }
+
+size_t String::capacity() const { return capacity_; }
+
+bool String::empty() const { return size_ == 0; }
+
+char* String::data() const { return data_; }
+
+void String::push_back(char c) {
+	if (size_ == capacity_) {
+		resize(capacity_ == 0 ? 1 : capacity_ * 2);
+	}
+	data_[size_++] = c;
+	data_[size_] = '\0';
+}
+
+void String::pop_back() {
+	if (size_ > 0) {
+		--size_;
+		data_[size_] = '\0';
+	}
+}
+
+void String::clear() {
+	size_ = 0;
+	if (data_) {
+		data_[0] = '\0';
+	}
+}
+
+void String::resize(size_t new_capacity) {
+	if (new_capacity < size_) {
+		return;
+	}
+	char* new_data = new char[new_capacity + 1];
+	if (data_) {
+		Utility::strcpy(new_data, data_);
+	}
+	new_data[size_] = '\0';
+	delete[] data_;
+	data_ = new_data;
+	capacity_ = new_capacity;
+}
+
+#endif
