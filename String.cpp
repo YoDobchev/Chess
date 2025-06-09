@@ -4,7 +4,25 @@
 #include "String.h"
 #include "Utility.h"
 
-String::String() : data_(nullptr), size_(0), capacity_(0) {}
+String::String() : data_(new char[1]), size_(0), capacity_(0) {
+    data_[0] = '\0';
+}
+
+String::String(const String& other)
+    : data_(new char[other.capacity_ + 1]), size_(other.size_), capacity_(other.capacity_) {
+    Utility::strcpy(data_, other.data_);
+}
+
+String& String::operator=(const String& other) {
+    if (this != &other) {
+        delete[] data_;
+        size_ = other.size_;
+        capacity_ = other.capacity_;
+        data_ = new char[capacity_ + 1];
+        Utility::strcpy(data_, other.data_);
+    }
+    return *this;
+}
 
 String::String(const char* s) {
 	if (s) {
@@ -30,6 +48,16 @@ bool String::operator==(const String& other) const { return Utility::strcmp(data
 std::ostream& operator<<(std::ostream& os, const String str) {
 	os << str.c_str();
 	return os;
+}
+
+std::istream& getline(std::istream& is, String& str) {
+    str.clear();
+    char c;
+    while (is.get(c)) {
+        if (c == '\n') break;
+        str.push_back(c);
+    }
+    return is;
 }
 
 const char* String::c_str() const { return data_ ? data_ : ""; }
