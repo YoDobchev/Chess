@@ -2,7 +2,28 @@
 #define STRING_CPP
 
 #include "String.h"
-#include "Utility.h"
+
+size_t Utility::strlen(const char* src) {
+	size_t len = 0;
+	while (*src++)
+		len++;
+	return len;
+}
+
+char* Utility::strcpy(char* dest, const char* src) {
+	char* original = dest;
+	while ((*dest++ = *src++) != '\0') {
+	}
+	return original;
+}
+
+int Utility::strcmp(const char* s1, const char* s2) {
+	while (*s1 && (*s1 == *s2)) {
+		s1++;
+		s2++;
+	}
+	return (unsigned char)*s1 - (unsigned char)*s2;
+}
 
 String::String() : data_(new char[1]), size_(0), capacity_(0) { data_[0] = '\0'; }
 

@@ -3,6 +3,15 @@
 
 #include <iostream>
 
+class Utility {
+  public:
+	static size_t strlen(const char* src);
+
+	static char* strcpy(char* dest, const char* src);
+
+	static int strcmp(const char* s1, const char* s2);
+};
+
 class String {
   private:
 	void resize(size_t new_capacity);
