@@ -1,5 +1,6 @@
 #include "GameState.h"
 
+// void GameState::
 void GameState::startGame() {
 	String inputStr, error;
 	do {

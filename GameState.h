@@ -1,5 +1,5 @@
 #include <iostream>
-#include "board.h"
+#include "Board.h"
 #include "String.h"
 #include "InputHandler.h"
 

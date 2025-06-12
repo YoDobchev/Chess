@@ -1,7 +1,7 @@
 #ifndef PIECES_H
 #define PIECES_H
 
-#include "board.h"
+#include "Board.h"
 
 class Piece {
   private:

@@ -1,7 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "pieces.h"
+#include "Pieces.h"
 
 class Square {
   private:
@@ -16,7 +16,7 @@ class Board {
 	Square board[8][8];
 
   public:
-	Square* operator[](int row) { return board[row]; }
+	Square* operator[](int row);
 };
 
 #endif
