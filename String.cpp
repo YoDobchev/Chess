@@ -4,24 +4,22 @@
 #include "String.h"
 #include "Utility.h"
 
-String::String() : data_(new char[1]), size_(0), capacity_(0) {
-    data_[0] = '\0';
-}
+String::String() : data_(new char[1]), size_(0), capacity_(0) { data_[0] = '\0'; }
 
 String::String(const String& other)
     : data_(new char[other.capacity_ + 1]), size_(other.size_), capacity_(other.capacity_) {
-    Utility::strcpy(data_, other.data_);
+	Utility::strcpy(data_, other.data_);
 }
 
 String& String::operator=(const String& other) {
-    if (this != &other) {
-        delete[] data_;
-        size_ = other.size_;
-        capacity_ = other.capacity_;
-        data_ = new char[capacity_ + 1];
-        Utility::strcpy(data_, other.data_);
-    }
-    return *this;
+	if (this != &other) {
+		delete[] data_;
+		size_ = other.size_;
+		capacity_ = other.capacity_;
+		data_ = new char[capacity_ + 1];
+		Utility::strcpy(data_, other.data_);
+	}
+	return *this;
 }
 
 String::String(const char* s) {
@@ -51,13 +49,13 @@ std::ostream& operator<<(std::ostream& os, const String str) {
 }
 
 std::istream& getline(std::istream& is, String& str) {
-    str.clear();
-    char c;
-    while (is.get(c)) {
-        if (c == '\n') break;
-        str.push_back(c);
-    }
-    return is;
+	str.clear();
+	char c;
+	while (is.get(c)) {
+		if (c == '\n') break;
+		str.push_back(c);
+	}
+	return is;
 }
 
 const char* String::c_str() const { return data_ ? data_ : ""; }
@@ -87,9 +85,7 @@ void String::pop_back() {
 
 void String::clear() {
 	size_ = 0;
-	if (data_) {
-		data_[0] = '\0';
-	}
+	data_[0] = '\0';
 }
 
 void String::resize(size_t new_capacity) {
@@ -100,7 +96,6 @@ void String::resize(size_t new_capacity) {
 	if (data_) {
 		Utility::strcpy(new_data, data_);
 	}
-	new_data[size_] = '\0';
 	delete[] data_;
 	data_ = new_data;
 	capacity_ = new_capacity;

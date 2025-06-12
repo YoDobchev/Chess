@@ -1,9 +1,9 @@
-#ifndef EVENTHANDLER_H
-#define EVENTHANDLER_H
+#ifndef INPUTHANDLER_H
+#define INPUTHANDLER_H
 
 #include "String.h"
 
-class EventHandler {
+class InputHandler {
   public:
 	static size_t charToBoardIndex(char c) {
 		if (c >= 'a' && c <= 'h') return c - 'a';
