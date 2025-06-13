@@ -1,46 +1,67 @@
 #ifndef PIECES_H
 #define PIECES_H
 
-#include "Board.h"
+// #include "Board.h"
+#include "Types.h"
+#include "String.h"
 
 class Piece {
-  private:
+  protected:
 	// Square* pos;
-	bool color;
+	Player color;
 
   public:
-	virtual bool checkIfValidMove();
+	Piece(Player color);
+	virtual String getEmoji() = 0;
+	// virtual bool checkIfValidMove() = 0;
 };
 
 class Pawn : public Piece {
   private:
   public:
-	bool checkIfValidMove() override;
+	using Piece::Piece;
+
+	String getEmoji() override;
+	// bool checkIfValidMove() override;
 };
 
 class Rook : public Piece {
   public:
-	bool checkIfValidMove() override;
+	using Piece::Piece;
+	String getEmoji() override;
+	// bool checkIfValidMove() override;
 };
 
 class Bishop : public Piece {
   public:
-	bool checkIfValidMove() override;
+	using Piece::Piece;
+	String getEmoji() override;
+
+	// bool checkIfValidMove() override;
 };
 
 class Knight : public Piece {
   public:
-	bool checkIfValidMove() override;
+	using Piece::Piece;
+	String getEmoji() override;
+
+	// bool checkIfValidMove() override;
 };
 
 class Queen : public Piece {
   public:
-	bool checkIfValidMove() override;
+	using Piece::Piece;
+	String getEmoji() override;
+
+	// bool checkIfValidMove() override;
 };
 
-class Kign : public Piece {
+class King : public Piece {
   public:
-	bool checkIfValidMove() override;
+	using Piece::Piece;
+	String getEmoji() override;
+
+	// bool checkIfValidMove() override;
 };
 
 #endif

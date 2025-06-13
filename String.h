@@ -44,5 +44,4 @@ class String {
 	void clear();
 };
 
-#include "String.cpp"
 #endif

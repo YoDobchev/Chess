@@ -1,9 +1,7 @@
 #include "GameState.h"
-// #include "String.h"
 
 int main() {
- 
     GameState newGame;
-    newGame.startGame();
+    newGame.start();
     return 0;
 }

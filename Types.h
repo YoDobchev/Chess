@@ -2,10 +2,10 @@
 #define TYPES_H
 
 struct Position {
-	int x, y;
+	int row, col;
 };
 
-enum class Players {
+enum class Player {
 	WHITE,
 	BLACK	
 };

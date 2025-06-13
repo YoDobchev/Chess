@@ -2,13 +2,19 @@
 #define BOARD_H
 
 #include "Pieces.h"
+#include "Types.h"
+
+class Piece;
 
 class Square {
   private:
-	Piece* peice;
+	Piece* piece;
 
   public:
 	Square();
+  // ~Square();
+  void setPiece(Piece* piece);
+  Piece* getPiece() const;
 };
 
 class Board {
@@ -16,7 +22,10 @@ class Board {
 	Square board[8][8];
 
   public:
-	Square* operator[](int row);
+	Board();
+	Square* operator[](const int row);
+	Piece* getPieceAtPos(Position pos) const;
 };
+
 
 #endif

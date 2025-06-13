@@ -1,6 +1,3 @@
-#ifndef STRING_CPP
-#define STRING_CPP
-
 #include "String.h"
 
 size_t Utility::strlen(const char* src) {
@@ -121,5 +118,3 @@ void String::resize(size_t new_capacity) {
 	data_ = new_data;
 	capacity_ = new_capacity;
 }
-
-#endif
