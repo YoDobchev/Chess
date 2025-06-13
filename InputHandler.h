@@ -5,9 +5,14 @@
 
 class InputHandler {
   public:
-	static size_t charToBoardIndex(char c) {
+	static int charToBoardIndex(char c) {
 		if (c >= 'a' && c <= 'h') return c - 'a';
 		if (c >= 'A' && c <= 'H') return c - 'A';
+		return 0;
+	}
+
+	static int charIntToBoardIndex(char c) {
+		if (c >= '1' && c <= '8') return c - '1';
 		return 0;
 	}
 

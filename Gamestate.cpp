@@ -46,6 +46,28 @@ void GameState::printBoard() {
 	std::cout << "  a b c d e f g h         h g f e d c b a\n";
 }
 
+void GameState::executeCommand(const String& inputStr) {
+	String cmd;
+	int p = 0;
+
+	InputHandler::token(cmd, inputStr, p);
+
+	if (cmd == "move") {
+		String from, to;
+		InputHandler::token(from, inputStr, p);
+		InputHandler::token(to, inputStr, p);
+		Position fromPos = {InputHandler::charIntToBoardIndex(from[1]), InputHandler::charToBoardIndex(from[0])};
+		Position toPos = {InputHandler::charIntToBoardIndex(to[1]), InputHandler::charToBoardIndex(to[0])};
+
+		// if (board->getPieceAtPos(fromPos)->getColor() != playerTurn) {
+		// 	error = "It's not your turn";
+		// 	return;
+		// }
+
+		if (board->movePiece(fromPos, toPos, playerTurn, error)) playerTurn = !playerTurn;
+	}
+}
+
 void GameState::update() {
 	String inputStr;
 	do {
@@ -56,7 +78,14 @@ void GameState::update() {
 		}
 		std::cout << "enter command: ";
 		getline(std::cin, inputStr);
+
 	} while (!InputHandler::isExistingCommand(inputStr, error) || !InputHandler::areValidParams(inputStr, error));
+
+	executeCommand(inputStr);
 }
 
-void GameState::start() { update(); }
+void GameState::start() {
+	while (true) {
+		update();
+	}
+}
