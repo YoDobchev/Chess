@@ -4,6 +4,14 @@
 #include "String.h"
 
 class InputHandler {
+  private:
+	static bool isValidCoordinate(const String& coord) {
+		if (coord.size() != 2) return false;
+		char col = coord[0];
+		char row = coord[1];
+		return (col >= 'a' && col <= 'h') && (row >= '1' && row <= '8');
+	}
+
   public:
 	static int charToBoardIndex(char c) {
 		if (c >= 'a' && c <= 'h') return c - 'a';
@@ -26,7 +34,7 @@ class InputHandler {
 	}
 
 	static bool isExistingCommand(String& inputStr, String& error) {
-		const String validCmds[] = {"move", "save", "load"};
+		const String validCmds[] = {"move", "mark", "save", "load"};
 		String cmd;
 		int p = 0;
 
@@ -55,17 +63,24 @@ class InputHandler {
 				error = "Missing parameters for move command!";
 				return false;
 			}
-			if (from.size() != 2 || to.size() != 2) {
-				error = "Invalid move parameters format!";
-				return false;
-			}
-			if (from[0] < 'a' || from[0] > 'h' || to[0] < 'a' || to[0] > 'h' || from[1] < '1' || from[1] > '8'
-			    || to[1] < '1' || to[1] > '8') {
+			if (!isValidCoordinate(from) || !isValidCoordinate(to)) {
 				error = "Invalid move coordinates!";
 				return false;
 			}
 			if (from[0] == to[0] && from[1] == to[1]) {
 				error = "Move cannot be the same square!";
+				return false;
+			}
+		} else if (cmd == "mark") {
+			String pos;
+			token(pos, inputStr, p);
+			if (pos.empty()) {
+				error = "Position cannot be empty!";
+				return false;
+			}
+
+			if (!isValidCoordinate(pos)) {
+				error = "Invalid position coordinates!";
 				return false;
 			}
 		} else if (cmd == "save" || cmd == "load") {

@@ -63,6 +63,8 @@ const char& String::operator[](size_t index) const { return data_[index]; }
 
 bool String::operator==(const String& other) const { return Utility::strcmp(data_, other.data_) == 0; }
 
+bool String::operator!=(const String& other) const { return !(*this == other); }
+
 std::ostream& operator<<(std::ostream& os, const String str) {
 	os << str.c_str();
 	return os;

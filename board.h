@@ -10,9 +10,12 @@ class Square {
   private:
 	Piece* piece;
 	bool isAttackedBy[2];
+  String specialColor;
 
   public:
 	Square();
+  String getSpecialColor() const;
+  void setSpecialColor(const String& color);
 	void setPiece(Piece* piece);
 	Piece* getPiece() const;
 };
@@ -22,7 +25,8 @@ class Board {
 	Square board[8][8];
 
   public:
-	Position enPassantSquare;
+  // Used for clearing the en passant square after a move
+	Position enPassantSquare, oldEnPassantSquare;
 	Board();
 	Square* operator[](const int row);
 	Piece* getPieceAtPos(const Position pos) const;

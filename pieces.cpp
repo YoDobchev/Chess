@@ -7,6 +7,8 @@ Piece::Piece(Player color, Position pos) : color(color), pos(pos), hasMoved(fals
 
 Player Piece::getColor() const { return color; }
 
+Vector<Position> Piece::getValidMoves() const { return validMoves; }
+
 void Piece::setPosition(Position newPos) { pos = newPos; }
 
 bool Piece::checkIfValidMove(const Position to, const Board* board, String& error) {
@@ -164,11 +166,18 @@ void Pawn::move(const Position to, Board* board, String& error) {
 	const int colOffsets[2] = {-1, 1};
 	for (int i = 0; i < 2; ++i) {
 		Position capturePos = {pos.row + direction, pos.col + colOffsets[i]};
-		if (capturePos == board->enPassantSquare) {
+		if (capturePos == board->oldEnPassantSquare) {
 			Position enPassantCapturePos = {to.row - direction, to.col};
 			board->operator[](enPassantCapturePos.row)[enPassantCapturePos.col].setPiece(nullptr);
 		}
 	}
 
 	Piece::move(to, board, error);
+}
+
+void King::move(const Position to, Board* board, String& error) {
+    // Piece::move(to, board, error);
+    // if (to.col == 6 || to.col == 2) {
+    //     // Castling logic can be added here
+    // }
 }

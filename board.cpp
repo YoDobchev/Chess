@@ -1,7 +1,11 @@
 #include "Board.h"
 #include "Pieces.h"
 
-Square::Square() : piece(nullptr) {}
+Square::Square() : piece(nullptr), specialColor("") {}
+
+String Square::getSpecialColor() const { return specialColor; }
+
+void Square::setSpecialColor(const String& color) { specialColor = color; }
 
 void Square::setPiece(Piece* piece) { this->piece = piece; }
 
@@ -67,8 +71,10 @@ bool Board::movePiece(const Position from, const Position to, const Player playe
 		return false;
 	}
 
+	oldEnPassantSquare = enPassantSquare;
+	if (enPassantSquare.row != -1) enPassantSquare = {-1, -1};
+
 	pieceToMove->move(to, this, error);
 
-	// if (enPassantSquare.row != -1 && enPassantSquare.col != -1) enPassantSquare = {-1, -1};
 	return true;
 }

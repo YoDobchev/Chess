@@ -1,32 +1,28 @@
 #include "GameState.h"
-#include <ostream>
 
 GameState::GameState() : playerTurn(Player::BLACK), gameOver(false) { board = new Board(); }
 
 GameState::~GameState() { delete board; }
 
 void GameState::printBoard() {
-	// if (board->getPieceAtPos({6, 0})) {
-	// 	std::cout << board->getPieceAtPos({6, 0})->getEmoji() << std::endl;
-	// }
 	std::cout << "  a b c d e f g h         h g f e d c b a" << std::endl;
 
 	for (int i = 0; i < 8; ++i) {
 		std::cout << 8 - i << " ";
 
 		for (int j = 0; j < 8; ++j) {
-			if ((i + j) % 2 == 0)
-				std::cout << "\033[47m";
+			Square& square = board->operator[](7 - i)[j];
+			if (square.getSpecialColor() != "") {
+				std::cout << "\033[" << square.getSpecialColor() << "m";
+			} else if ((i + j) % 2 == 0)
+				std::cout << "\033[107m";
 			else
-				std::cout << "\033[41m";
+				std::cout << "\033[101m";
 
-			// std::cout << i<< " " << j << " ";
-			if (Piece* p = board->getPieceAtPos({7 - i, j})) {
+			if (Piece* p = board->getPieceAtPos({7 - i, j}))
 				std::cout << p->getEmoji() << " ";
-				if (7 - i == 4 && j == 1) {
-					if (p->getColor() == Player::WHITE) std::cout << "PNIESSS";
-				}
-			} else
+
+			else
 				std::cout << "  ";
 
 			std::cout << "\033[0m";
@@ -35,10 +31,13 @@ void GameState::printBoard() {
 		std::cout << " " << 8 - i << "    " << i + 1 << " ";
 
 		for (int j = 7; j >= 0; --j) {
-			if ((i + j) % 2 == 0)
-				std::cout << "\033[47m";
+			Square& square = board->operator[](i)[j];
+			if (square.getSpecialColor() != "")
+				std::cout << "\033[" << square.getSpecialColor() << "m";
+			else if ((i + j) % 2 == 0)
+				std::cout << "\033[107m";
 			else
-				std::cout << "\033[41m";
+				std::cout << "\033[101m";
 
 			if (Piece* p = board->getPieceAtPos({i, j}))
 				std::cout << p->getEmoji() << " ";
@@ -60,6 +59,12 @@ void GameState::executeCommand(const String& inputStr) {
 
 	InputHandler::token(cmd, inputStr, p);
 
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 8; ++j) {
+			(*board)[i][j].setSpecialColor("");
+		}
+	}
+
 	if (cmd == "move") {
 		String from, to;
 		InputHandler::token(from, inputStr, p);
@@ -74,6 +79,23 @@ void GameState::executeCommand(const String& inputStr) {
 
 		if (board->movePiece(fromPos, toPos, playerTurn, error)) playerTurn = !playerTurn;
 		// board->movePiece(fromPos, toPos, playerTurn, error);
+	} else if (cmd == "mark") {
+		String posStr;
+		InputHandler::token(posStr, inputStr, p);
+		Position pos = {InputHandler::charIntToBoardIndex(posStr[1]), InputHandler::charToBoardIndex(posStr[0])};
+
+		Piece* piece = board->getPieceAtPos(pos);
+		if (!piece) {
+			error = "No piece at the selected position!";
+			return;
+		}
+		piece->calculateValidMoves(board);
+		Vector<Position> squaresToMark = piece->getValidMoves();
+
+		std::cout << squaresToMark.size();
+		for (int i = 0; i < squaresToMark.size(); ++i) {
+			board->operator[](squaresToMark[i].row)[squaresToMark[i].col].setSpecialColor("43");
+		}
 	}
 }
 

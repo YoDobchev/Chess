@@ -19,6 +19,7 @@ class Piece {
   public:
 	Piece(Player color, Position pos);
 	Player getColor() const;
+	Vector<Position> getValidMoves() const;
 	void setPosition(Position newPos);
 	virtual String getEmoji() const = 0;
 	virtual void calculateValidMoves(const Board* board) = 0;
@@ -87,8 +88,7 @@ class King : public Piece {
 	String getEmoji() const override;
 
 	void calculateValidMoves(const Board* board) override;
-	// void move(const Position to, Board* board, String& error) override;
-	using Piece::move;
+	void move(const Position to, Board* board, String& error) override;
 	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
 
