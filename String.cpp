@@ -1,5 +1,7 @@
 #include "String.h"
 
+size_t Utility::abs(int x) { return (x < 0) ? -x : x; }
+
 size_t Utility::strlen(const char* src) {
 	size_t len = 0;
 	while (*src++)

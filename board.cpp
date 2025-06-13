@@ -1,18 +1,14 @@
 #include "Board.h"
 #include "Pieces.h"
-#include "String.h"
-#include "Types.h"
 
 Square::Square() : piece(nullptr) {}
-
-// Square::~Square() { delete piece; }
 
 void Square::setPiece(Piece* piece) { this->piece = piece; }
 
 Piece* Square::getPiece() const { return piece; }
 
-Board::Board() {
-	for (int i = 0; i < 8; ++i) {
+Board::Board() : enPassantSquare({-1, -1}) {
+	for (int i = 1; i < 8; ++i) {
 		board[1][i].setPiece(new Pawn(Player::WHITE, {1, i}));
 		board[6][i].setPiece(new Pawn(Player::BLACK, {6, i}));
 	}
@@ -20,6 +16,7 @@ Board::Board() {
 	Player players[2] = {Player::WHITE, Player::BLACK};
 	int backRanks[2] = {0, 7};
 
+	board[4][2].setPiece(new Pawn(Player::WHITE, {4, 2}));
 	for (int p = 0; p < 2; ++p) {
 		int row = backRanks[p];
 		Player color = players[p];
@@ -36,12 +33,19 @@ Board::Board() {
 
 Square* Board::operator[](const int row) { return board[row]; }
 
-Piece* Board::getPieceAtPos(Position pos) const {
-	// if (!board[pos.row][pos.col]) return nullptr;
-	return board[pos.row][pos.col].getPiece();
-}
+Piece* Board::getPieceAtPos(Position pos) const { return board[pos.row][pos.col].getPiece(); }
 
 bool Board::movePiece(const Position from, const Position to, const Player playerTurn, String& error) {
+	std::cout << enPassantSquare.row << " " << enPassantSquare.col << "\n";
+
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 8; ++j) {
+			if (board[i][j].getPiece()) {
+				board[i][j].getPiece()->calculateValidMoves(this);
+			}
+		}
+	}
+
 	Piece* pieceToMove = getPieceAtPos(from);
 	if (!pieceToMove) {
 		error = "No piece at the source position!";
@@ -58,6 +62,13 @@ bool Board::movePiece(const Position from, const Position to, const Player playe
 		return false;
 	}
 
-	if (!pieceToMove->checkIfValidMove(to, this, error)) return false;
+	if (!pieceToMove->checkIfValidMove(to, this, error)) {
+		error = "Invalid move spot!";
+		return false;
+	}
+
+	pieceToMove->move(to, this, error);
+
+	// if (enPassantSquare.row != -1 && enPassantSquare.col != -1) enPassantSquare = {-1, -1};
 	return true;
 }

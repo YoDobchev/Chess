@@ -5,6 +5,8 @@
 
 class Utility {
   public:
+	static size_t abs(int x);
+
 	static size_t strlen(const char* src);
 
 	static char* strcpy(char* dest, const char* src);

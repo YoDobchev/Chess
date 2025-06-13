@@ -1,11 +1,15 @@
 #include "GameState.h"
+#include <ostream>
 
-GameState::GameState() : playerTurn(Player::WHITE), gameOver(false) { board = new Board(); }
+GameState::GameState() : playerTurn(Player::BLACK), gameOver(false) { board = new Board(); }
 
 GameState::~GameState() { delete board; }
 
 void GameState::printBoard() {
-	std::cout << "  a b c d e f g h         h g f e d c b a\n";
+	// if (board->getPieceAtPos({6, 0})) {
+	// 	std::cout << board->getPieceAtPos({6, 0})->getEmoji() << std::endl;
+	// }
+	std::cout << "  a b c d e f g h         h g f e d c b a" << std::endl;
 
 	for (int i = 0; i < 8; ++i) {
 		std::cout << 8 - i << " ";
@@ -16,9 +20,13 @@ void GameState::printBoard() {
 			else
 				std::cout << "\033[41m";
 
-			if (Piece* p = board->getPieceAtPos({7 - i, j}))
+			// std::cout << i<< " " << j << " ";
+			if (Piece* p = board->getPieceAtPos({7 - i, j})) {
 				std::cout << p->getEmoji() << " ";
-			else
+				if (7 - i == 4 && j == 1) {
+					if (p->getColor() == Player::WHITE) std::cout << "PNIESSS";
+				}
+			} else
 				std::cout << "  ";
 
 			std::cout << "\033[0m";
@@ -65,6 +73,7 @@ void GameState::executeCommand(const String& inputStr) {
 		// }
 
 		if (board->movePiece(fromPos, toPos, playerTurn, error)) playerTurn = !playerTurn;
+		// board->movePiece(fromPos, toPos, playerTurn, error);
 	}
 }
 
@@ -76,6 +85,7 @@ void GameState::update() {
 			std::cout << error << std::endl;
 			error.clear();
 		}
+		std::cout << (playerTurn == Player::WHITE ? "[WHITE] " : "[BLACK] ");
 		std::cout << "enter command: ";
 		getline(std::cin, inputStr);
 
