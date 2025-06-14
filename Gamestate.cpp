@@ -1,6 +1,6 @@
 #include "GameState.h"
 
-GameState::GameState() : playerTurn(Player::BLACK), gameOver(false) { board = new Board(); }
+GameState::GameState() : playerTurn(Player::WHITE), gameOver(false) { board = new Board(); }
 
 GameState::~GameState() { delete board; }
 
@@ -104,6 +104,36 @@ void GameState::executeCommand(const String& inputStr) {
 	}
 }
 
+bool GameState::hasGameEndned() {
+	stalemate = true;
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 8; ++j) {
+			Piece* piece = (*board)[i][j].getPiece();
+			if (!piece) continue;
+
+			if (King* king = dynamic_cast<King*>(piece)) {
+				if ((*board).getCheckExists() && king->getValidMoves().empty()) {
+					checkmate = true;
+				}
+			} else {
+				stalemate = false;
+			}
+		}
+	}
+
+	if (checkmate) {
+		std::cout << "Checkmate! " << !playerTurn << " wins!" << std::endl;
+		return true;
+	}
+
+	if (stalemate) {
+		std::cout << "Stalemate! The game is a draw!" << std::endl;
+		return true;
+	}
+
+	return false;
+}
+
 void GameState::update() {
 	String inputStr;
 	do {
@@ -119,6 +149,8 @@ void GameState::update() {
 	} while (!InputHandler::isExistingCommand(inputStr, error) || !InputHandler::areValidParams(inputStr, error));
 
 	executeCommand(inputStr);
+
+	gameOver = hasGameEndned();
 }
 
 void GameState::start() {

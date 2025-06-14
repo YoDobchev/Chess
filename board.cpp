@@ -25,25 +25,31 @@ Piece* Square::getPiece() const { return piece; }
 Board::Board() : enPassantSquare({-1, -1}) {
 	for (int i = 1; i < 8; ++i) {
 		// board[1][i].setPiece(new Pawn(Player::WHITE, {1, i}));
-		board[6][i].setPiece(new Pawn(Player::BLACK, {6, i}));
+		// board[6][i].setPiece(new Pawn(Player::BLACK, {6, i}));
 	}
 
 	Player players[2] = {Player::WHITE, Player::BLACK};
 	int backRanks[2] = {0, 7};
 
-	board[3][2].setPiece(new King(Player::WHITE, {3, 2}));
-	board[3][4].setPiece(new King(Player::BLACK, {3, 4}));
+	board[3][3].setPiece(new King(Player::WHITE, {3, 3}));
+	// board[4][2].setPiece(new Pawn(Player::BLACK, {3, 2}));
+
+	board[0][0].setPiece(new King(Player::BLACK, {0, 0}));
+	board[4][0].setPiece(new Rook(Player::BLACK, {4, 0}));
+	board[2][0].setPiece(new Rook(Player::BLACK, {2, 0}));
+	board[5][1].setPiece(new Rook(Player::BLACK, {5, 1}));
+
 	for (int p = 0; p < 2; ++p) {
 		int row = backRanks[p];
 		Player color = players[p];
-		board[row][0].setPiece(new Rook(color, {row, 0}));
+		// board[row][0].setPiece(new Rook(color, {row, 0}));
 		// board[row][1].setPiece(new Knight(color, {row, 1}));
 		// board[row][2].setPiece(new Bishop(color, {row, 2}));
 		// board[row][3].setPiece(new Queen(color, {row, 3}));
-		board[row][4].setPiece(new King(color, {row, 4}));
+		// board[row][4].setPiece(new King(color, {row, 4}));
 		// board[row][5].setPiece(new Bishop(color, {row, 5}));
 		// board[row][6].setPiece(new Knight(color, {row, 6}));
-		board[row][7].setPiece(new Rook(color, {row, 7}));
+		// board[row][7].setPiece(new Rook(color, {row, 7}));
 	}
 }
 
@@ -61,19 +67,21 @@ void Board::calculateSquares() {
 	for (int i = 0; i < 8; ++i) {
 		for (int j = 0; j < 8; ++j) {
 			Piece* piece = board[i][j].getPiece();
-			if (piece) {
-				piece->calculateValidMoves(this);
-				piece->setAttackedSquares(this);
-			}
+			if (!piece) continue;
+
+			piece->calculateValidMoves(this);
+			piece->setAttackedSquares(this);
 		}
 	}
 
-	// Calculate valid moves for every king again
+	// Calculate valid moves for both kings again
 	for (int i = 0; i < 8; ++i) {
 		for (int j = 0; j < 8; ++j) {
 			Piece* piece = board[i][j].getPiece();
-			if (piece && dynamic_cast<King*>(piece)) {
-				piece->calculateValidMoves(this);
+			if (!piece) continue;
+
+			if (King* king = dynamic_cast<King*>(piece)) {
+				king->calculateValidMoves(this);
 			}
 		}
 	}
@@ -94,7 +102,7 @@ bool Board::movePiece(const Position from, const Position to, const Player playe
 
 	Piece* pieceToMove = getPieceAtPos(from);
 	if (!pieceToMove) {
-		error = "No piece at the source position!";
+		error = "No piece at the from position!";
 		return false;
 	}
 

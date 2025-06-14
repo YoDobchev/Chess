@@ -11,11 +11,13 @@ class GameState {
 	Player playerTurn;
 	Board* board;
 	String error;
+	bool checkmate, stalemate;
   public:
 	GameState();
 	~GameState();
 	void printBoard();
 	void executeCommand(const String& inputStr);
+	bool hasGameEndned();
 	void update();
 	void start();
 };

@@ -29,7 +29,6 @@ class Board {
 	Square board[8][8];
 	bool checkExists;
 
-
   public:
 	// Used for clearing the en passant square after a move
 	Position enPassantSquare, oldEnPassantSquare;
@@ -40,7 +39,8 @@ class Board {
 	void clearAttackedSquares();
 	void setCheckExists(bool exists);
 	bool getCheckExists() const;
-	// bool isSquareAttacked(const Position sq, Player byPlayer);
+	bool getCheckmate() const;
+	bool getStalemate() const;
 	bool movePiece(const Position from, const Position to, const Player playerTurn, String& error);
 };
 
