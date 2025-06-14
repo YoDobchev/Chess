@@ -6,51 +6,40 @@ GameState::GameState() : playerTurn(Player::WHITE), gameOver(false) { board = ne
 
 GameState::~GameState() { delete board; }
 
+void GameState::drawSquare(Position pos) {
+	if (int specialCol = (*board)[pos.row][pos.col].getSpecialColor()) {
+		std::cout << "\033[" << specialCol << "m";
+	} else {
+		bool white = ((pos.row + pos.col) % 2 == 0);
+		std::cout << (white ? "\033[107m" : "\033[101m");
+	}
+
+	if (Piece* piece = board->getPieceAtPos(pos))
+		std::cout << piece->getEmoji() << ' ';
+	else
+		std::cout << "  ";
+
+	std::cout << "\033[0m";
+}
+
 void GameState::printBoard() {
-	std::cout << "  a b c d e f g h         h g f e d c b a" << std::endl;
+	std::cout << "  a b c d e f g h         h g f e d c b a\n";
 
 	for (int i = 0; i < 8; ++i) {
-		std::cout << 8 - i << " ";
-		for (int j = 0; j < 8; ++j) {
-			Square& square = (*board)[7 - i][j];
-			if (square.getSpecialColor()) {
-				std::cout << "\033[" << square.getSpecialColor() << "m";
-			} else if ((i + j) % 2 == 0)
-				std::cout << "\033[107m";
-			else
-				std::cout << "\033[101m";
+		int rowLeft = 7 - i;
+		int rowRight = i;
 
-			if (Piece* p = board->getPieceAtPos({7 - i, j}))
-				std::cout << p->getEmoji() << " ";
+		std::cout << (8 - i) << ' ';
 
-			else
-				std::cout << "  ";
+		for (int j = 0; j < 8; ++j)
+			drawSquare({rowLeft, j});
 
-			std::cout << "\033[0m";
-		}
+		std::cout << ' ' << (8 - i) << "    " << (i + 1) << ' ';
 
-		std::cout << " " << 8 - i << "    " << i + 1 << " ";
+		for (int j = 7; j >= 0; --j)
+			drawSquare({rowRight, j});
 
-		for (int j = 7; j >= 0; --j) {
-			Square& square = (*board)[i][j];
-			if (square.getAttackedBy(Player::BLACK))
-				std::cout << "\033[108m";
-			else if (square.getSpecialColor())
-				std::cout << "\033[" << square.getSpecialColor() << "m";
-			else if ((i + j) % 2 == 0)
-				std::cout << "\033[107m";
-			else
-				std::cout << "\033[101m";
-
-			if (Piece* p = board->getPieceAtPos({i, j}))
-				std::cout << p->getEmoji() << " ";
-			else
-				std::cout << "  ";
-
-			std::cout << "\033[0m";
-		}
-
-		std::cout << " " << i + 1 << "\n";
+		std::cout << ' ' << (i + 1) << "\n";
 	}
 
 	std::cout << "  a b c d e f g h         h g f e d c b a\n";

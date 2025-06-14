@@ -17,6 +17,7 @@ class GameState {
   public:
 	GameState();
 	~GameState();
+	void drawSquare(Position pos);
 	void printBoard();
 	void checkForPawnPromotion();
 	void executeCommand(const String& inputStr);
