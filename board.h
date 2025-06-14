@@ -27,7 +27,7 @@ class Square {
 class Board {
   private:
 	Square board[8][8];
-	bool checkExists;
+	int checkExists;
 
   public:
 	// Used for clearing the en passant square after a move
@@ -37,8 +37,8 @@ class Board {
 	Piece* getPieceAtPos(const Position pos) const;
 	void calculateSquares();
 	void clearAttackedSquares();
-	void setCheckExists(bool exists);
-	bool getCheckExists() const;
+	void setCheckExists(int exists);
+	int getCheckExists() const;
 	bool getCheckmate() const;
 	bool getStalemate() const;
 	bool movePiece(const Position from, const Position to, const Player playerTurn, String& error);

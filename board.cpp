@@ -22,7 +22,7 @@ void Square::clearAttackedBy() {
 
 Piece* Square::getPiece() const { return piece; }
 
-Board::Board() : enPassantSquare({-1, -1}) {
+Board::Board() : enPassantSquare({-1, -1}), checkExists(-1) {
 	for (int i = 1; i < 8; ++i) {
 		// board[1][i].setPiece(new Pawn(Player::WHITE, {1, i}));
 		// board[6][i].setPiece(new Pawn(Player::BLACK, {6, i}));
@@ -31,13 +31,15 @@ Board::Board() : enPassantSquare({-1, -1}) {
 	Player players[2] = {Player::WHITE, Player::BLACK};
 	int backRanks[2] = {0, 7};
 
-	board[3][3].setPiece(new King(Player::WHITE, {3, 3}));
+	board[1][4].setPiece(new King(Player::WHITE, {4, 1}));
 	// board[4][2].setPiece(new Pawn(Player::BLACK, {3, 2}));
 
 	board[0][0].setPiece(new King(Player::BLACK, {0, 0}));
-	board[4][0].setPiece(new Rook(Player::BLACK, {4, 0}));
-	board[2][0].setPiece(new Rook(Player::BLACK, {2, 0}));
-	board[5][1].setPiece(new Rook(Player::BLACK, {5, 1}));
+	// board[4][0].setPiece(new Rook(Player::BLACK, {4, 0}));
+	// board[2][0].setPiece(new Rook(Player::BLACK, {2, 0}));
+	board[1][0].setPiece(new Bishop(Player::BLACK, {1, 0}));
+	board[0][1].setPiece(new Bishop(Player::BLACK, {0, 1}));
+	board[4][0].setPiece(new Bishop(Player::BLACK, {4, 0}));
 
 	for (int p = 0; p < 2; ++p) {
 		int row = backRanks[p];
@@ -60,8 +62,8 @@ Piece* Board::getPieceAtPos(Position pos) const {
 	return board[pos.row][pos.col].getPiece();
 }
 
-void Board::setCheckExists(bool exists) { checkExists = exists; }
-bool Board::getCheckExists() const { return checkExists; }
+void Board::setCheckExists(int exists) { checkExists = exists; }
+int Board::getCheckExists() const { return checkExists; }
 
 void Board::calculateSquares() {
 	for (int i = 0; i < 8; ++i) {
@@ -96,8 +98,6 @@ void Board::clearAttackedSquares() {
 }
 
 bool Board::movePiece(const Position from, const Position to, const Player playerTurn, String& error) {
-	std::cout << enPassantSquare.row << " " << enPassantSquare.col << "\n";
-
 	calculateSquares();
 
 	Piece* pieceToMove = getPieceAtPos(from);
@@ -106,7 +106,7 @@ bool Board::movePiece(const Position from, const Position to, const Player playe
 		return false;
 	}
 
-	if (checkExists && dynamic_cast<King*>(pieceToMove) == nullptr) {
+	if (checkExists == static_cast<int>(playerTurn) && dynamic_cast<King*>(pieceToMove) == nullptr) {
 		error = "You cannot move a piece while in check!";
 		return false;
 	}
@@ -132,7 +132,7 @@ bool Board::movePiece(const Position from, const Position to, const Player playe
 
 	pieceToMove->move(to, this, error);
 
-	setCheckExists(false);
+	setCheckExists(-1);
 
 	clearAttackedSquares();
 

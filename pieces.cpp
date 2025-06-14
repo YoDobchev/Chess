@@ -1,6 +1,5 @@
 #include "Pieces.h"
 #include "Board.h"
-#include "String.h"
 #include "Types.h"
 
 Piece::Piece(Player color, Position pos) : color(color), pos(pos), hasMoved(false) {}
@@ -33,22 +32,39 @@ void Piece::addValidMovesBasedOnDirections(const Board* board, const Vector<Dire
 			Piece* targetPiece = board->getPieceAtPos(next);
 			if (targetPiece == nullptr) {
 				validMoves.push_back(next);
-			} else {
-				if (targetPiece->getColor() != color) {
-					validMoves.push_back(next);
-				}
-				break;
+				attackingMoves.push_back(next);
+				continue;
 			}
+
+			if (targetPiece->getColor() != color) {
+				validMoves.push_back(next);
+			}
+
+			King* king = dynamic_cast<King*>(targetPiece);
+			if (king != nullptr) {
+				attackingMoves.push_back(next);
+
+				Position oneOver = next;
+				oneOver.move(directions[i]);
+				if (!oneOver.isOutOfBounds()) {
+					attackingMoves.push_back(oneOver);
+				}
+			}
+
+			break;
 		}
 	}
 }
 
 void Piece::setAttackedSquares(Board* board) const {
-	for (int i = 0; i < validMoves.size(); ++i) {
-		Position movePos = validMoves[i];
+	for (int i = 0; i < attackingMoves.size(); ++i) {
+		Position movePos = attackingMoves[i];
 		if (movePos.isOutOfBounds()) continue;
 		(*board)[movePos.row][movePos.col].setAttackedBy(color);
-		if (dynamic_cast<King*>(board->getPieceAtPos(movePos))) board->setCheckExists(true);
+		King* king = dynamic_cast<King*>(board->getPieceAtPos(movePos));
+		if (king && king->getColor() != color) {
+			board->setCheckExists(static_cast<int>(!color));
+		}
 	}
 }
 
@@ -61,8 +77,10 @@ void Pawn::setAttackedSquares(Board* board) const {
 		if (capturePos.isOutOfBounds()) continue;
 		Piece* targetPiece = board->getPieceAtPos(capturePos);
 		(*board)[capturePos.row][capturePos.col].setAttackedBy(color);
-		if (dynamic_cast<King*>(targetPiece)) board->setCheckExists(true);
-
+		King* king = dynamic_cast<King*>(targetPiece);
+		if (king && king->getColor() != color) {
+			board->setCheckExists(static_cast<int>(!color));
+		}
 	}
 }
 
@@ -92,6 +110,7 @@ String King::getEmoji() const { return color == Player::WHITE ? "♔" : "♚"; }
 
 void Pawn::calculateValidMoves(Board* board) {
 	validMoves.clear();
+	attackingMoves.clear();
 	const int direction = (color == Player::WHITE) ? 1 : -1;
 	const int startRow = (color == Player::WHITE) ? 1 : 6;
 
@@ -123,6 +142,7 @@ void Pawn::calculateValidMoves(Board* board) {
 
 void Rook::calculateValidMoves(Board* board) {
 	validMoves.clear();
+	attackingMoves.clear();
 	Vector<Direction> directions;
 	directions.push_back(UP);
 	directions.push_back(DOWN);
@@ -133,6 +153,7 @@ void Rook::calculateValidMoves(Board* board) {
 
 void Bishop::calculateValidMoves(Board* board) {
 	validMoves.clear();
+	attackingMoves.clear();
 	Vector<Direction> directions;
 	directions.push_back(UP_LEFT);
 	directions.push_back(UP_RIGHT);
@@ -143,6 +164,7 @@ void Bishop::calculateValidMoves(Board* board) {
 
 void Knight::calculateValidMoves(Board* board) {
 	validMoves.clear();
+	attackingMoves.clear();
 	const Direction knightMoves[] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
 
 	for (int i = 0; i < 8; ++i) {
@@ -152,6 +174,7 @@ void Knight::calculateValidMoves(Board* board) {
 			Piece* targetPiece = board->getPieceAtPos(next);
 			if (targetPiece == nullptr || targetPiece->getColor() != color) {
 				validMoves.push_back(next);
+				attackingMoves.push_back(next);
 			}
 		}
 	}
@@ -159,6 +182,7 @@ void Knight::calculateValidMoves(Board* board) {
 
 void Queen::calculateValidMoves(Board* board) {
 	validMoves.clear();
+	attackingMoves.clear();
 	Vector<Direction> directions;
 	directions.push_back(UP);
 	directions.push_back(DOWN);
@@ -173,6 +197,7 @@ void Queen::calculateValidMoves(Board* board) {
 
 void King::calculateValidMoves(Board* board) {
 	validMoves.clear();
+	attackingMoves.clear();
 	const Direction kingMoves[] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
 	for (int i = 0; i < 8; ++i) {
@@ -182,6 +207,7 @@ void King::calculateValidMoves(Board* board) {
 			Piece* targetPiece = board->getPieceAtPos(next);
 			if (targetPiece == nullptr || targetPiece->getColor() != color) {
 				validMoves.push_back(next);
+				attackingMoves.push_back(next);
 			}
 		}
 	}
@@ -193,11 +219,13 @@ void King::calculateValidMoves(Board* board) {
 		if (longCastlingRook && !longCastlingRook->getHasMoved() && board->getPieceAtPos({backrank, 1}) == nullptr
 		    && board->getPieceAtPos({backrank, 2}) == nullptr && board->getPieceAtPos({backrank, 3}) == nullptr) {
 			validMoves.push_back(Position{backrank, 2});
+			attackingMoves.push_back(Position{backrank, 2});
 			canLongCastle = true;
 		}
 		if (shortCastlingRook && !shortCastlingRook->getHasMoved() && board->getPieceAtPos({backrank, 5}) == nullptr
 		    && board->getPieceAtPos({backrank, 6}) == nullptr) {
 			validMoves.push_back(Position{backrank, 6});
+			attackingMoves.push_back(Position{backrank, 6});
 			canShortCastle = true;
 		}
 	}

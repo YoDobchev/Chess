@@ -17,7 +17,7 @@ class GameState {
 	~GameState();
 	void printBoard();
 	void executeCommand(const String& inputStr);
-	bool hasGameEndned();
+	bool hasGameEnded();
 	void update();
 	void start();
 };

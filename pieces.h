@@ -11,7 +11,7 @@ class Piece {
   protected:
 	Player color;
 	Position pos;
-	Vector<Position> validMoves;
+	Vector<Position> validMoves, attackingMoves;
 	bool hasMoved;
 
 	void addValidMovesBasedOnDirections(const Board* board, const Vector<Direction>& directions);

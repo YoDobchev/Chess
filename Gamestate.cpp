@@ -1,6 +1,6 @@
 #include "GameState.h"
 
-GameState::GameState() : playerTurn(Player::WHITE), gameOver(false) { board = new Board(); }
+GameState::GameState() : playerTurn(Player::BLACK), gameOver(false) { board = new Board(); }
 
 GameState::~GameState() { delete board; }
 
@@ -32,7 +32,7 @@ void GameState::printBoard() {
 
 		for (int j = 7; j >= 0; --j) {
 			Square& square = board->operator[](i)[j];
-			if (square.getAttackedBy(Player::WHITE) || square.getAttackedBy(Player::BLACK))
+			if (square.getAttackedBy(Player::BLACK))
 				std::cout << "\033[108m";
 			else if (square.getSpecialColor())
 				std::cout << "\033[" << square.getSpecialColor() << "m";
@@ -94,7 +94,7 @@ void GameState::executeCommand(const String& inputStr) {
 			error = "No piece at the selected position!";
 			return;
 		}
-		// piece->calculateValidMoves(board);
+
 		board->calculateSquares();
 		const Vector<Position>& squaresToMark = piece->getValidMoves();
 
@@ -104,7 +104,9 @@ void GameState::executeCommand(const String& inputStr) {
 	}
 }
 
-bool GameState::hasGameEndned() {
+bool GameState::hasGameEnded() {
+	(*board).calculateSquares();
+
 	stalemate = true;
 	for (int i = 0; i < 8; ++i) {
 		for (int j = 0; j < 8; ++j) {
@@ -112,7 +114,7 @@ bool GameState::hasGameEndned() {
 			if (!piece) continue;
 
 			if (King* king = dynamic_cast<King*>(piece)) {
-				if ((*board).getCheckExists() && king->getValidMoves().empty()) {
+				if ((*board).getCheckExists() != -1 && king->getValidMoves().size() == 0) {
 					checkmate = true;
 				}
 			} else {
@@ -120,6 +122,8 @@ bool GameState::hasGameEndned() {
 			}
 		}
 	}
+
+	if (checkmate || stalemate) printBoard();
 
 	if (checkmate) {
 		std::cout << "Checkmate! " << !playerTurn << " wins!" << std::endl;
@@ -150,7 +154,7 @@ void GameState::update() {
 
 	executeCommand(inputStr);
 
-	gameOver = hasGameEndned();
+	gameOver = hasGameEnded();
 }
 
 void GameState::start() {
