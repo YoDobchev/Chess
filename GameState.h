@@ -16,6 +16,7 @@ class GameState {
 	GameState();
 	~GameState();
 	void printBoard();
+	void checkForPawnPromotion();
 	void executeCommand(const String& inputStr);
 	bool hasGameEnded();
 	void update();

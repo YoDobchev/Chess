@@ -1,6 +1,6 @@
 #include "GameState.h"
 
-GameState::GameState() : playerTurn(Player::BLACK), gameOver(false) { board = new Board(); }
+GameState::GameState() : playerTurn(Player::WHITE), gameOver(false) { board = new Board(); }
 
 GameState::~GameState() { delete board; }
 
@@ -11,7 +11,7 @@ void GameState::printBoard() {
 		std::cout << 8 - i << " ";
 
 		for (int j = 0; j < 8; ++j) {
-			Square& square = board->operator[](7 - i)[j];
+			Square& square = (*board)[7 - i][j];
 			if (square.getSpecialColor()) {
 				std::cout << "\033[" << square.getSpecialColor() << "m";
 			} else if ((i + j) % 2 == 0)
@@ -31,7 +31,7 @@ void GameState::printBoard() {
 		std::cout << " " << 8 - i << "    " << i + 1 << " ";
 
 		for (int j = 7; j >= 0; --j) {
-			Square& square = board->operator[](i)[j];
+			Square& square = (*board)[i][j];
 			if (square.getAttackedBy(Player::BLACK))
 				std::cout << "\033[108m";
 			else if (square.getSpecialColor())
@@ -53,6 +53,38 @@ void GameState::printBoard() {
 	}
 
 	std::cout << "  a b c d e f g h         h g f e d c b a\n";
+}
+
+void GameState::checkForPawnPromotion() {
+	int backrank = (!playerTurn == Player::WHITE) ? 7 : 0;
+	std::cout << backrank << std::endl;
+	for (int i = 0; i < 8; ++i) {
+		Piece* piece = (*board)[backrank][i].getPiece();
+		if (piece && dynamic_cast<Pawn*>(piece)) {
+			if (piece->getColor() == !playerTurn) {
+				String promotionChoice;
+				while (true) {
+					std::cout << "Pawn promotion available! Choose a piece (Q, R, B, N): ";
+					getline(std::cin, promotionChoice);
+					if (promotionChoice == "Q") {
+						(*board)[backrank][i].setPiece(new Queen(playerTurn, {backrank, i}));
+						break;
+					} else if (promotionChoice == "R") {
+						(*board)[backrank][i].setPiece(new Rook(playerTurn, {backrank, i}));
+						break;
+					} else if (promotionChoice == "B") {
+						(*board)[backrank][i].setPiece(new Bishop(playerTurn, {backrank, i}));
+						break;
+					} else if (promotionChoice == "N") {
+						(*board)[backrank][i].setPiece(new Knight(playerTurn, {backrank, i}));
+						break;
+					} else {
+						std::cout << "Invalid choice!" << std::endl;
+					}
+				}
+			}
+		}
+	}
 }
 
 void GameState::executeCommand(const String& inputStr) {
@@ -84,6 +116,7 @@ void GameState::executeCommand(const String& inputStr) {
 
 		if (board->movePiece(fromPos, toPos, playerTurn, error)) playerTurn = !playerTurn;
 		// board->movePiece(fromPos, toPos, playerTurn, error);
+		checkForPawnPromotion();
 	} else if (cmd == "mark") {
 		String posStr;
 		InputHandler::token(posStr, inputStr, p);
@@ -99,7 +132,7 @@ void GameState::executeCommand(const String& inputStr) {
 		const Vector<Position>& squaresToMark = piece->getValidMoves();
 
 		for (int i = 0; i < squaresToMark.size(); ++i) {
-			board->operator[](squaresToMark[i].row)[squaresToMark[i].col].setSpecialColor(43);
+			(*board)[squaresToMark[i].row][squaresToMark[i].col].setSpecialColor(43);
 		}
 	}
 }
