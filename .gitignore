@@ -2,3 +2,4 @@ compile.sh
 chess
 .clang-format
 .vscode/
+savefiles/*.save

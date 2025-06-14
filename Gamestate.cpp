@@ -111,7 +111,7 @@ void GameState::executeCommand(const String& inputStr) {
 		InputHandler::token(filename, inputStr, p);
 
 		std::cout << board->serialize() << std::endl;
-		String fullPath = String("./savefiles/") + filename;
+		String fullPath = "./savefiles/" + filename + ".save";
 		std::ofstream outFile(fullPath.c_str(), std::ios::out);
 		if (!outFile) {
 			error = "Couldn't open file!";
@@ -124,7 +124,7 @@ void GameState::executeCommand(const String& inputStr) {
 		String filename;
 		InputHandler::token(filename, inputStr, p);
 
-		String fullPath = String("./savefiles/") + filename;
+		String fullPath = "./savefiles/" + filename + ".save";
 		std::ifstream inFile(fullPath.c_str(), std::ios::in);
 		if (!inFile) {
 			error = "Couldn't open file!";
