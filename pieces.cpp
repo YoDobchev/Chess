@@ -38,6 +38,8 @@ void Piece::addValidMovesBasedOnDirections(const Board* board, const Vector<Dire
 
 			if (targetPiece->getColor() != color) {
 				validMoves.push_back(next);
+			} else {
+				attackingMoves.push_back(next);
 			}
 
 			King* king = dynamic_cast<King*>(targetPiece);
