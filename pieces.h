@@ -17,7 +17,7 @@ class Piece {
 	void addValidMovesBasedOnDirections(const Board* board, const Vector<Direction>& directions);
 
   public:
-	Piece(Player color, Position pos);
+	Piece(Player color);
 	virtual ~Piece() = default;
 	Player getColor() const;
 	const Vector<Position>& getValidMoves() const;

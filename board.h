@@ -37,6 +37,7 @@ class Board {
 	Square* operator[](const int row);
 	String serialize() const;
 
+	void setPiece(Piece* piece, const Position pos);
 	Piece* getPieceAtPos(const Position pos) const;
 	void calculateSquares();
 	void clearAttackedSquares();

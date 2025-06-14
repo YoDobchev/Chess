@@ -24,34 +24,24 @@ Piece* Square::getPiece() const { return piece; }
 
 Board::Board() : enPassantSquare({-1, -1}), checkExists(-1) {
 	for (int i = 0; i < 8; ++i) {
-		board[1][i].setPiece(new Pawn(Player::WHITE, {1, i}));
-		board[6][i].setPiece(new Pawn(Player::BLACK, {6, i}));
+		setPiece(new Pawn(Player::WHITE), {1, i});
+		setPiece(new Pawn(Player::BLACK), {6, i});
 	}
 
 	Player players[2] = {Player::WHITE, Player::BLACK};
 	int backRanks[2] = {0, 7};
 
-	// board[1][4].setPiece(new King(Player::WHITE, {1, 4}));
-	// board[6][2].setPiece(new Pawn(Player::WHITE, {6, 2}));
-
-	// board[0][0].setPiece(new King(Player::BLACK, {0, 0}));
-	// board[4][0].setPiece(new Rook(Player::BLACK, {4, 0}));
-	// board[2][0].setPiece(new Rook(Player::BLACK, {2, 0}));
-	// board[1][0].setPiece(new Bishop(Player::BLACK, {1, 0}));
-	// board[0][1].setPiece(new Bishop(Player::BLACK, {0, 1}));
-	// board[4][0].setPiece(new Bishop(Player::BLACK, {4, 0}));
-
 	for (int p = 0; p < 2; ++p) {
 		int row = backRanks[p];
 		Player color = players[p];
-		board[row][0].setPiece(new Rook(color, {row, 0}));
-		board[row][1].setPiece(new Knight(color, {row, 1}));
-		board[row][2].setPiece(new Bishop(color, {row, 2}));
-		board[row][3].setPiece(new Queen(color, {row, 3}));
-		board[row][4].setPiece(new King(color, {row, 4}));
-		board[row][5].setPiece(new Bishop(color, {row, 5}));
-		board[row][6].setPiece(new Knight(color, {row, 6}));
-		board[row][7].setPiece(new Rook(color, {row, 7}));
+		setPiece(new Rook(color), {row, 0});
+		setPiece(new Knight(color), {row, 1});
+		setPiece(new Bishop(color), {row, 2});
+		setPiece(new Queen(color), {row, 3});
+		setPiece(new King(color), {row, 4});
+		setPiece(new Bishop(color), {row, 5});
+		setPiece(new Knight(color), {row, 6});
+		setPiece(new Rook(color), {row, 7});
 	}
 	calculateSquares();
 }
@@ -66,22 +56,22 @@ Board::Board(const String& serializedData) : enPassantSquare({-1, -1}), checkExi
 				Position pos = {i, j};
 				switch (Utility::toLower(pieceChar)) {
 				case 'p':
-					board[i][j].setPiece(new Pawn(color, pos));
+					setPiece(new Pawn(color), pos);
 					break;
 				case 'r':
-					board[i][j].setPiece(new Rook(color, pos));
+					setPiece(new Rook(color), pos);
 					break;
 				case 'b':
-					board[i][j].setPiece(new Bishop(color, pos));
+					setPiece(new Bishop(color), pos);
 					break;
 				case 'n':
-					board[i][j].setPiece(new Knight(color, pos));
+					setPiece(new Knight(color), pos);
 					break;
 				case 'q':
-					board[i][j].setPiece(new Queen(color, pos));
+					setPiece(new Queen(color), pos);
 					break;
 				case 'k':
-					board[i][j].setPiece(new King(color, pos));
+					setPiece(new King(color), pos);
 					break;
 				}
 			}
@@ -105,6 +95,12 @@ String Board::serialize() const {
 		result.push_back('\n');
 	}
 	return result;
+}
+
+void Board::setPiece(Piece* piece, const Position pos) {
+	if (pos.isOutOfBounds()) return;
+	board[pos.row][pos.col].setPiece(piece);
+	if (piece) piece->setPosition(pos);
 }
 
 Piece* Board::getPieceAtPos(Position pos) const {

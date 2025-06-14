@@ -57,16 +57,16 @@ void GameState::checkForPawnPromotion() {
 					std::cout << "Pawn promotion available! Choose a piece (q, r, b, n): ";
 					getline(std::cin, promotionChoice);
 					if (promotionChoice == "q") {
-						(*board)[backrank][i].setPiece(new Queen(playerTurn, {backrank, i}));
+						(*board).setPiece(new Queen(playerTurn), {backrank, i});
 						break;
 					} else if (promotionChoice == "r") {
-						(*board)[backrank][i].setPiece(new Rook(playerTurn, {backrank, i}));
+						(*board).setPiece(new Rook(playerTurn), {backrank, i});
 						break;
 					} else if (promotionChoice == "b") {
-						(*board)[backrank][i].setPiece(new Bishop(playerTurn, {backrank, i}));
+						(*board).setPiece(new Bishop(playerTurn), {backrank, i});
 						break;
 					} else if (promotionChoice == "n") {
-						(*board)[backrank][i].setPiece(new Knight(playerTurn, {backrank, i}));
+						(*board).setPiece(new Knight(playerTurn), {backrank, i});
 						break;
 					} else {
 						std::cout << "Invalid choice!" << std::endl;

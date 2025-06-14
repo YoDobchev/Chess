@@ -2,7 +2,7 @@
 #include "Board.h"
 #include "Types.h"
 
-Piece::Piece(Player color, Position pos) : color(color), pos(pos), hasMoved(false) {}
+Piece::Piece(Player color) : color(color), hasMoved(false) {}
 
 Player Piece::getColor() const { return color; }
 
