@@ -31,6 +31,15 @@ int Utility::strcmp(const char* s1, const char* s2) {
 	return (unsigned char)*s1 - (unsigned char)*s2;
 }
 
+String Utility::invertMove(const String& mv) {
+	String inv;
+	inv.push_back(mv[2]);
+	inv.push_back(mv[3]);
+	inv.push_back(mv[0]);
+	inv.push_back(mv[1]);
+	return inv;
+}
+
 String::String() : data_(new char[1]), size_(0), capacity_(0) { data_[0] = '\0'; }
 
 String::String(const String& other)

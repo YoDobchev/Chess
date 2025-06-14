@@ -3,10 +3,12 @@
 
 #include <iostream>
 
+class String;
+
 class Utility {
   public:
 	static char toLower(char c);
-	
+
 	static size_t abs(int x);
 
 	static size_t strlen(const char* src);
@@ -14,6 +16,8 @@ class Utility {
 	static char* strcpy(char* dest, const char* src);
 
 	static int strcmp(const char* s1, const char* s2);
+
+	static String invertMove(const String& mv);
 };
 
 class String {

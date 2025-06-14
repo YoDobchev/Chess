@@ -113,6 +113,10 @@ void GameState::executeCommand(const String& inputStr) {
 		// }
 
 		if (board->movePiece(fromPos, toPos, playerTurn, error)) playerTurn = !playerTurn;
+
+		if (lastSixMoves.size() == 6) lastSixMoves.erase(0);
+		lastSixMoves.push_back(from + to);
+
 		checkForPawnPromotion();
 	} else if (cmd == "mark") {
 		String posStr;
@@ -164,12 +168,14 @@ void GameState::executeCommand(const String& inputStr) {
 		inFile.close();
 
 		constexpr size_t expectedSize = 8 * 9 + 1;
-		if (boardData.size() != expectedSize ){
+		if (boardData.size() != expectedSize) {
 			error = "Invalid file format!";
 			return;
 		}
 
 		playerTurn = (boardData[boardData.size() - 1] == 'w') ? Player::WHITE : Player::BLACK;
+
+		lastSixMoves.clear();
 
 		delete board;
 		board = new Board(boardData);
@@ -177,7 +183,9 @@ void GameState::executeCommand(const String& inputStr) {
 }
 
 bool GameState::hasGameEnded() {
-	stalemate = true;
+	bool stalemate = true;
+	bool checkmate = false;
+	bool repetition = false;
 	for (int i = 0; i < 8; ++i) {
 		for (int j = 0; j < 8; ++j) {
 			Piece* piece = (*board)[i][j].getPiece();
@@ -193,7 +201,24 @@ bool GameState::hasGameEnded() {
 		}
 	}
 
-	if (checkmate || stalemate) printBoard();
+	if (lastSixMoves.size() == 6) {
+		repetition = true;
+		for (int i = 0; i < 3; ++i) {
+			const String& W1 = lastSixMoves[0];
+			const String& W2 = lastSixMoves[2];
+			const String& W3 = lastSixMoves[4];
+			bool whiteRep = (W1 == W3) && (W2 == Utility::invertMove(W1));
+
+			const String& B1 = lastSixMoves[1];
+			const String& B2 = lastSixMoves[3];
+			const String& B3 = lastSixMoves[5];
+			bool blackRep = (B1 == B3) && (B2 == Utility::invertMove(B1));
+
+			repetition = whiteRep && blackRep;
+		}
+	}
+
+	if (checkmate || stalemate || repetition) printBoard();
 
 	if (checkmate) {
 		std::cout << "Checkmate! " << !playerTurn << " wins!" << std::endl;
@@ -202,6 +227,11 @@ bool GameState::hasGameEnded() {
 
 	if (stalemate) {
 		std::cout << "Stalemate! The game is a draw!" << std::endl;
+		return true;
+	}
+
+	if (repetition) {
+		std::cout << "Draw by repetition!" << std::endl;
 		return true;
 	}
 
@@ -217,7 +247,7 @@ void GameState::update() {
 			error.clear();
 		}
 		std::cout << (playerTurn == Player::WHITE ? "[WHITE] " : "[BLACK] ");
-		std::cout << "enter command: ";
+		std::cout << "Enter command: ";
 		getline(std::cin, inputStr);
 
 	} while (!InputHandler::isExistingCommand(inputStr, error) || !InputHandler::areValidParams(inputStr, error));

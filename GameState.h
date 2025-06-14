@@ -12,7 +12,8 @@ class GameState {
 	Player playerTurn;
 	Board* board;
 	String error;
-	bool checkmate, stalemate;
+	Vector<String> lastSixMoves;
+
   public:
 	GameState();
 	~GameState();
