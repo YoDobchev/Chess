@@ -5,6 +5,8 @@
 
 class Utility {
   public:
+	static char toLower(char c);
+	
 	static size_t abs(int x);
 
 	static size_t strlen(const char* src);
@@ -36,6 +38,7 @@ class String {
 	const char& operator[](size_t index) const;
 	bool operator==(const String& other) const;
 	bool operator!=(const String& other) const;
+	friend String operator+(const String& lhs, const String& rhs);
 	friend std::ostream& operator<<(std::ostream& os, const String& str);
 	friend std::istream& getline(std::istream& is, String& str);
 	const char* c_str() const;

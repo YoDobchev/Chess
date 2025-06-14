@@ -33,7 +33,10 @@ class Board {
 	// Used for clearing the en passant square after a move
 	Position enPassantSquare, oldEnPassantSquare;
 	Board();
+	Board(const String& serializedData);
 	Square* operator[](const int row);
+	String serialize() const;
+
 	Piece* getPieceAtPos(const Position pos) const;
 	void calculateSquares();
 	void clearAttackedSquares();

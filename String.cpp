@@ -1,5 +1,12 @@
 #include "String.h"
 
+char Utility::toLower(char c) {
+	if (c >= 'A' && c <= 'Z') {
+		return c + ('a' - 'A');
+	}
+	return c;
+}
+
 size_t Utility::abs(int x) { return (x < 0) ? -x : x; }
 
 size_t Utility::strlen(const char* src) {
@@ -84,6 +91,13 @@ const char& String::operator[](size_t index) const { return data_[index]; }
 bool String::operator==(const String& other) const { return Utility::strcmp(data_, other.data_) == 0; }
 
 bool String::operator!=(const String& other) const { return !(*this == other); }
+
+String operator+(const String& lhs, const String& rhs) {
+	String result(lhs);
+	for (size_t i = 0; i < rhs.size(); ++i)
+		result.push_back(rhs[i]);
+	return result;
+}
 
 std::ostream& operator<<(std::ostream& os, const String& str) {
 	os << str.c_str();

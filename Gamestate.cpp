@@ -1,4 +1,6 @@
 #include "GameState.h"
+#include "String.h"
+#include "Types.h"
 
 GameState::GameState() : playerTurn(Player::WHITE), gameOver(false) { board = new Board(); }
 
@@ -9,7 +11,6 @@ void GameState::printBoard() {
 
 	for (int i = 0; i < 8; ++i) {
 		std::cout << 8 - i << " ";
-
 		for (int j = 0; j < 8; ++j) {
 			Square& square = (*board)[7 - i][j];
 			if (square.getSpecialColor()) {
@@ -64,18 +65,18 @@ void GameState::checkForPawnPromotion() {
 			if (piece->getColor() == !playerTurn) {
 				String promotionChoice;
 				while (true) {
-					std::cout << "Pawn promotion available! Choose a piece (Q, R, B, N): ";
+					std::cout << "Pawn promotion available! Choose a piece (q, r, b, n): ";
 					getline(std::cin, promotionChoice);
-					if (promotionChoice == "Q") {
+					if (promotionChoice == "q") {
 						(*board)[backrank][i].setPiece(new Queen(playerTurn, {backrank, i}));
 						break;
-					} else if (promotionChoice == "R") {
+					} else if (promotionChoice == "r") {
 						(*board)[backrank][i].setPiece(new Rook(playerTurn, {backrank, i}));
 						break;
-					} else if (promotionChoice == "B") {
+					} else if (promotionChoice == "b") {
 						(*board)[backrank][i].setPiece(new Bishop(playerTurn, {backrank, i}));
 						break;
-					} else if (promotionChoice == "N") {
+					} else if (promotionChoice == "n") {
 						(*board)[backrank][i].setPiece(new Knight(playerTurn, {backrank, i}));
 						break;
 					} else {
@@ -111,11 +112,7 @@ void GameState::executeCommand(const String& inputStr) {
 		// 	return;
 		// }
 
-		// std::cout << "Moving from " << fromPos.row << " " << fromPos.col << " to " << toPos.row << " " << toPos.col
-		// << std::endl;
-
 		if (board->movePiece(fromPos, toPos, playerTurn, error)) playerTurn = !playerTurn;
-		// board->movePiece(fromPos, toPos, playerTurn, error);
 		checkForPawnPromotion();
 	} else if (cmd == "mark") {
 		String posStr;
@@ -134,12 +131,52 @@ void GameState::executeCommand(const String& inputStr) {
 		for (int i = 0; i < squaresToMark.size(); ++i) {
 			(*board)[squaresToMark[i].row][squaresToMark[i].col].setSpecialColor(43);
 		}
+	} else if (cmd == "save") {
+		String filename;
+		InputHandler::token(filename, inputStr, p);
+
+		std::cout << board->serialize() << std::endl;
+		String fullPath = String("./savefiles/") + filename;
+		std::ofstream outFile(fullPath.c_str(), std::ios::out);
+		if (!outFile) {
+			error = "Couldn't open file!";
+			return;
+		}
+		outFile << board->serialize();
+		outFile << (playerTurn == Player::WHITE ? 'w' : 'b');
+		outFile.close();
+	} else if (cmd == "load") {
+		String filename;
+		InputHandler::token(filename, inputStr, p);
+
+		String fullPath = String("./savefiles/") + filename;
+		std::ifstream inFile(fullPath.c_str(), std::ios::in);
+		if (!inFile) {
+			error = "Couldn't open file!";
+			return;
+		}
+
+		String boardData;
+		char c;
+		while (inFile.get(c)) {
+			boardData.push_back(c);
+		}
+		inFile.close();
+
+		constexpr size_t expectedSize = 8 * 9 + 1;
+		if (boardData.size() != expectedSize ){
+			error = "Invalid file format!";
+			return;
+		}
+
+		playerTurn = (boardData[boardData.size() - 1] == 'w') ? Player::WHITE : Player::BLACK;
+
+		delete board;
+		board = new Board(boardData);
 	}
 }
 
 bool GameState::hasGameEnded() {
-	(*board).calculateSquares();
-
 	stalemate = true;
 	for (int i = 0; i < 8; ++i) {
 		for (int j = 0; j < 8; ++j) {
@@ -186,6 +223,8 @@ void GameState::update() {
 	} while (!InputHandler::isExistingCommand(inputStr, error) || !InputHandler::areValidParams(inputStr, error));
 
 	executeCommand(inputStr);
+
+	(*board).calculateSquares();
 
 	gameOver = hasGameEnded();
 }

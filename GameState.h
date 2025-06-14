@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "Board.h"
 #include "String.h"
 #include "InputHandler.h"

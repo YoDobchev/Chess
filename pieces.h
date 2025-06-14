@@ -26,6 +26,7 @@ class Piece {
 	void setPosition(Position newPos);
 	virtual String getEmoji() const = 0;
 	virtual void calculateValidMoves(Board* board) = 0;
+	virtual char serialize() const = 0;
 	bool checkIfValidMove(const Position to, const Board* board, String& error);
 	virtual void setAttackedSquares(Board* board) const;
 	virtual void move(const Position to, Board* board, String& error);
@@ -36,6 +37,7 @@ class Pawn : public Piece {
   public:
 	using Piece::Piece;
 	String getEmoji() const override;
+	char serialize() const override;
 
 	void calculateValidMoves(Board* board) override;
 	void setAttackedSquares(Board* board) const override;
@@ -47,6 +49,7 @@ class Rook : public Piece {
   public:
 	using Piece::Piece;
 	String getEmoji() const override;
+	char serialize() const override;
 
 	void calculateValidMoves(Board* board) override;
 	// void move(const Position to, Board* board, String& error) override;
@@ -59,6 +62,7 @@ class Bishop : public Piece {
   public:
 	using Piece::Piece;
 	String getEmoji() const override;
+	char serialize() const override;
 
 	void calculateValidMoves(Board* board) override;
 	// void move(const Position to, Board* board, String& error) override;
@@ -71,6 +75,7 @@ class Knight : public Piece {
   public:
 	using Piece::Piece;
 	String getEmoji() const override;
+	char serialize() const override;
 
 	void calculateValidMoves(Board* board) override;
 	// void move(const Position to, Board* board, String& error) override;
@@ -83,6 +88,7 @@ class Queen : public Piece {
   public:
 	using Piece::Piece;
 	String getEmoji() const override;
+	char serialize() const override;
 
 	void calculateValidMoves(Board* board) override;
 	// void move(const Position to, Board* board, String& error) override;
@@ -99,6 +105,7 @@ class King : public Piece {
   public:
 	using Piece::Piece;
 	String getEmoji() const override;
+	char serialize() const override;
 
 	void calculateValidMoves(Board* board) override;
 	void setAttackedSquares(Board* board) const override;

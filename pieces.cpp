@@ -294,3 +294,10 @@ void King::move(const Position to, Board* board, String& error) {
 	}
 	Piece::move(to, board, error);
 }
+
+char Pawn::serialize() const { return (color == Player::WHITE) ? 'p' : 'P' ; }
+char Rook::serialize() const { return (color == Player::WHITE) ? 'r' : 'R'; }
+char Bishop::serialize() const { return (color == Player::WHITE) ? 'b' : 'B'; }
+char Knight::serialize() const { return (color == Player::WHITE) ? 'n' : 'N'; }
+char Queen::serialize() const { return (color == Player::WHITE) ? 'q' : 'Q'; }
+char King::serialize() const { return (color == Player::WHITE) ? 'k' : 'K'; }
