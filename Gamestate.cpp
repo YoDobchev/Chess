@@ -12,7 +12,7 @@ void GameState::printBoard() {
 
 		for (int j = 0; j < 8; ++j) {
 			Square& square = board->operator[](7 - i)[j];
-			if (square.getSpecialColor() != "") {
+			if (square.getSpecialColor()) {
 				std::cout << "\033[" << square.getSpecialColor() << "m";
 			} else if ((i + j) % 2 == 0)
 				std::cout << "\033[107m";
@@ -32,7 +32,7 @@ void GameState::printBoard() {
 
 		for (int j = 7; j >= 0; --j) {
 			Square& square = board->operator[](i)[j];
-			if (square.getSpecialColor() != "")
+			if (square.getSpecialColor())
 				std::cout << "\033[" << square.getSpecialColor() << "m";
 			else if ((i + j) % 2 == 0)
 				std::cout << "\033[107m";
@@ -61,7 +61,7 @@ void GameState::executeCommand(const String& inputStr) {
 
 	for (int i = 0; i < 8; ++i) {
 		for (int j = 0; j < 8; ++j) {
-			(*board)[i][j].setSpecialColor("");
+			(*board)[i][j].setSpecialColor(0);
 		}
 	}
 
@@ -77,8 +77,10 @@ void GameState::executeCommand(const String& inputStr) {
 		// 	return;
 		// }
 
-		if (board->movePiece(fromPos, toPos, playerTurn, error)) playerTurn = !playerTurn;
-		// board->movePiece(fromPos, toPos, playerTurn, error);
+		// std::cout << "Moving from " << fromPos.row << " " << fromPos.col << " to " << toPos.row << " " << toPos.col << std::endl;
+
+		// if (board->movePiece(fromPos, toPos, playerTurn, error)) playerTurn = !playerTurn;
+		board->movePiece(fromPos, toPos, playerTurn, error);
 	} else if (cmd == "mark") {
 		String posStr;
 		InputHandler::token(posStr, inputStr, p);
@@ -90,11 +92,10 @@ void GameState::executeCommand(const String& inputStr) {
 			return;
 		}
 		piece->calculateValidMoves(board);
-		Vector<Position> squaresToMark = piece->getValidMoves();
+		const Vector<Position>& squaresToMark = piece->getValidMoves();
 
-		std::cout << squaresToMark.size();
 		for (int i = 0; i < squaresToMark.size(); ++i) {
-			board->operator[](squaresToMark[i].row)[squaresToMark[i].col].setSpecialColor("43");
+			board->operator[](squaresToMark[i].row)[squaresToMark[i].col].setSpecialColor(43);
 		}
 	}
 }

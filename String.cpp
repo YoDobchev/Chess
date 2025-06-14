@@ -54,6 +54,26 @@ String::String(const char* s) {
 		capacity_ = 0;
 	}
 }
+String::String(String&& other) noexcept : data_(other.data_), size_(other.size_), capacity_(other.capacity_) {
+	other.data_ = nullptr;
+	other.size_ = 0;
+	other.capacity_ = 0;
+}
+
+String& String::operator=(String&& other) noexcept {
+	if (this != &other) {
+		delete[] data_;
+
+		data_ = other.data_;
+		size_ = other.size_;
+		capacity_ = other.capacity_;
+
+		other.data_ = nullptr;
+		other.size_ = 0;
+		other.capacity_ = 0;
+	}
+	return *this;
+}
 
 String::~String() { delete[] data_; }
 
@@ -65,7 +85,7 @@ bool String::operator==(const String& other) const { return Utility::strcmp(data
 
 bool String::operator!=(const String& other) const { return !(*this == other); }
 
-std::ostream& operator<<(std::ostream& os, const String str) {
+std::ostream& operator<<(std::ostream& os, const String& str) {
 	os << str.c_str();
 	return os;
 }

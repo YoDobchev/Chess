@@ -27,13 +27,16 @@ class String {
 	String(const char* s);
 	String(const String& other);
 	String& operator=(const String& other);
+	String(String&& other) noexcept;
+	String& operator=(String&& other) noexcept;
+
 	~String();
 
 	char& operator[](size_t index);
 	const char& operator[](size_t index) const;
 	bool operator==(const String& other) const;
 	bool operator!=(const String& other) const;
-	friend std::ostream& operator<<(std::ostream& os, const String str);
+	friend std::ostream& operator<<(std::ostream& os, const String& str);
 	friend std::istream& getline(std::istream& is, String& str);
 	const char* c_str() const;
 

@@ -7,7 +7,11 @@ Piece::Piece(Player color, Position pos) : color(color), pos(pos), hasMoved(fals
 
 Player Piece::getColor() const { return color; }
 
-Vector<Position> Piece::getValidMoves() const { return validMoves; }
+const Vector<Position>& Piece::getValidMoves() const { return validMoves; }
+
+bool Piece::getHasMoved() const { return hasMoved; }
+
+void Piece::setHasMoved(bool moved) { hasMoved = moved; }
 
 void Piece::setPosition(Position newPos) { pos = newPos; }
 
@@ -71,6 +75,7 @@ void Pawn::calculateValidMoves(const Board* board) {
 	const int colOffsets[2] = {-1, 1};
 	for (int i = 0; i < 2; ++i) {
 		Position capturePos = {pos.row + direction, pos.col + colOffsets[i]};
+		if (capturePos.isOutOfBounds()) continue;
 		Piece* targetPiece = board->getPieceAtPos(capturePos);
 		if (targetPiece && targetPiece->getColor() != color) {
 			validMoves.push_back(capturePos);
@@ -147,13 +152,29 @@ void King::calculateValidMoves(const Board* board) {
 			}
 		}
 	}
+
+	const int backrank = (color == Player::WHITE) ? 0 : 7;
+	if (pos.row == backrank && pos.col == 4 && !hasMoved) {
+		Piece* longCastlingRook = board->getPieceAtPos({backrank, 0});
+		Piece* shortCastlingRook = board->getPieceAtPos({backrank, 7});
+		if (longCastlingRook && !longCastlingRook->getHasMoved() && board->getPieceAtPos({backrank, 1}) == nullptr
+		    && board->getPieceAtPos({backrank, 2}) == nullptr && board->getPieceAtPos({backrank, 3}) == nullptr) {
+			validMoves.push_back(Position{backrank, 2});
+			canLongCastle = true;
+		}
+		if (shortCastlingRook && !shortCastlingRook->getHasMoved() && board->getPieceAtPos({backrank, 5}) == nullptr
+		    && board->getPieceAtPos({backrank, 6}) == nullptr) {
+			validMoves.push_back(Position{backrank, 6});
+			canShortCastle = true;
+		}
+	}
 }
 
 void Piece::move(const Position to, Board* board, String& error) {
 	Position from = pos;
 	this->setPosition(to);
-	board->operator[](to.row)[to.col].setPiece(this);
-	board->operator[](from.row)[from.col].setPiece(nullptr);
+	(*board)[to.row][to.col].setPiece(this);
+	(*board)[from.row][from.col].setPiece(nullptr);
 	hasMoved = true;
 }
 
@@ -166,6 +187,7 @@ void Pawn::move(const Position to, Board* board, String& error) {
 	const int colOffsets[2] = {-1, 1};
 	for (int i = 0; i < 2; ++i) {
 		Position capturePos = {pos.row + direction, pos.col + colOffsets[i]};
+		if (capturePos.isOutOfBounds()) continue;
 		if (capturePos == board->oldEnPassantSquare) {
 			Position enPassantCapturePos = {to.row - direction, to.col};
 			board->operator[](enPassantCapturePos.row)[enPassantCapturePos.col].setPiece(nullptr);
@@ -175,9 +197,27 @@ void Pawn::move(const Position to, Board* board, String& error) {
 	Piece::move(to, board, error);
 }
 
+void King::castleRook(Board* board, int row, int fromCol, int toCol) {
+	Position from{row, fromCol};
+	Position to{row, toCol};
+	Piece* rook = board->getPieceAtPos(from);
+	if (!rook) return;
+	rook->setPosition(to);
+	(*board)[to.row][to.col].setPiece(rook);
+	(*board)[from.row][from.col].setPiece(nullptr);
+	rook->setHasMoved(true);
+}
+
 void King::move(const Position to, Board* board, String& error) {
-    // Piece::move(to, board, error);
-    // if (to.col == 6 || to.col == 2) {
-    //     // Castling logic can be added here
-    // }
+	bool isShort = canShortCastle && to == Position{pos.row, pos.col + 2};
+	bool isLong = canLongCastle && to == Position{pos.row, pos.col - 2};
+    
+    
+	if (isShort) {
+        std::cout << "SHOOORT";
+        castleRook(board, to.row, pos.col + 3, pos.col + 1);
+	} else if (isLong) {
+        castleRook(board, to.row, pos.col - 4, pos.col - 1);
+	}
+    Piece::move(to, board, error);
 }

@@ -10,12 +10,13 @@ class Square {
   private:
 	Piece* piece;
 	bool isAttackedBy[2];
-  String specialColor;
+  int specialColor;
 
   public:
 	Square();
-  String getSpecialColor() const;
-  void setSpecialColor(const String& color);
+  ~Square();
+  int getSpecialColor() const;
+  void setSpecialColor(const int color);
 	void setPiece(Piece* piece);
 	Piece* getPiece() const;
 };

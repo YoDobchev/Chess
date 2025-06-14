@@ -1,11 +1,12 @@
 #include "Board.h"
 #include "Pieces.h"
 
-Square::Square() : piece(nullptr), specialColor("") {}
+Square::Square() : piece(nullptr), specialColor(0) {}
+Square::~Square() { piece = nullptr; }
 
-String Square::getSpecialColor() const { return specialColor; }
+int Square::getSpecialColor() const { return specialColor; }
 
-void Square::setSpecialColor(const String& color) { specialColor = color; }
+void Square::setSpecialColor(const int color) { specialColor = color; }
 
 void Square::setPiece(Piece* piece) { this->piece = piece; }
 
@@ -25,19 +26,22 @@ Board::Board() : enPassantSquare({-1, -1}) {
 		int row = backRanks[p];
 		Player color = players[p];
 		board[row][0].setPiece(new Rook(color, {row, 0}));
-		board[row][1].setPiece(new Knight(color, {row, 1}));
-		board[row][2].setPiece(new Bishop(color, {row, 2}));
-		board[row][3].setPiece(new Queen(color, {row, 3}));
+		// board[row][1].setPiece(new Knight(color, {row, 1}));
+		// board[row][2].setPiece(new Bishop(color, {row, 2}));
+		// board[row][3].setPiece(new Queen(color, {row, 3}));
 		board[row][4].setPiece(new King(color, {row, 4}));
-		board[row][5].setPiece(new Bishop(color, {row, 5}));
-		board[row][6].setPiece(new Knight(color, {row, 6}));
+		// board[row][5].setPiece(new Bishop(color, {row, 5}));
+		// board[row][6].setPiece(new Knight(color, {row, 6}));
 		board[row][7].setPiece(new Rook(color, {row, 7}));
 	}
 }
 
 Square* Board::operator[](const int row) { return board[row]; }
 
-Piece* Board::getPieceAtPos(Position pos) const { return board[pos.row][pos.col].getPiece(); }
+Piece* Board::getPieceAtPos(Position pos) const {
+	if (pos.isOutOfBounds()) return nullptr;
+	return board[pos.row][pos.col].getPiece();
+}
 
 bool Board::movePiece(const Position from, const Position to, const Player playerTurn, String& error) {
 	std::cout << enPassantSquare.row << " " << enPassantSquare.col << "\n";

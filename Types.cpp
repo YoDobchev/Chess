@@ -5,7 +5,7 @@ bool Position::operator==(const Position& other) const {
 }
 
 bool Position::operator!=(const Position& other) const {
-    return *this == other;
+    return !(*this == other);
 }
 
 Position& Position::move(Direction dir) {

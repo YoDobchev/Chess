@@ -22,6 +22,47 @@ template <typename T> class Vector {
   public:
 	Vector() : data_(nullptr), size_(0), capacity_(0) {}
 
+	Vector(const Vector& other) : data_(nullptr), size_(other.size_), capacity_(other.capacity_) {
+		if (capacity_) {
+			data_ = new T[capacity_];
+			for (size_t i = 0; i < size_; ++i)
+				data_[i] = other.data_[i];
+		}
+	}
+
+	Vector& operator=(const Vector& other) {
+		if (this != &other) {
+			T* newData = nullptr;
+			if (other.capacity_) {
+				newData = new T[other.capacity_];
+				for (size_t i = 0; i < other.size_; ++i)
+					newData[i] = other.data_[i];
+			}
+			delete[] data_;
+			data_ = newData;
+			size_ = other.size_;
+			capacity_ = other.capacity_;
+		}
+		return *this;
+	}
+
+	Vector(Vector&& other) noexcept : data_(other.data_), size_(other.size_), capacity_(other.capacity_) {
+		other.data_ = nullptr;
+		other.size_ = other.capacity_ = 0;
+	}
+
+	Vector& operator=(Vector&& other) noexcept {
+		if (this != &other) {
+			delete[] data_;
+			data_ = other.data_;
+			size_ = other.size_;
+			capacity_ = other.capacity_;
+			other.data_ = nullptr;
+			other.size_ = other.capacity_ = 0;
+		}
+		return *this;
+	}
+
 	~Vector() { delete[] data_; }
 
 	void push_back(const T& value) {
@@ -37,13 +78,9 @@ template <typename T> class Vector {
 		}
 	}
 
-	T& operator[](size_t index) {
-		return data_[index];
-	}
+	T& operator[](size_t index) { return data_[index]; }
 
-	const T& operator[](size_t index) const {
-		return data_[index];
-	}
+	const T& operator[](size_t index) const { return data_[index]; }
 
 	size_t size() const { return size_; }
 

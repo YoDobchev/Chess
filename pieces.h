@@ -18,8 +18,11 @@ class Piece {
 
   public:
 	Piece(Player color, Position pos);
+	virtual ~Piece() = default;
 	Player getColor() const;
-	Vector<Position> getValidMoves() const;
+	const Vector<Position>& getValidMoves() const;
+	bool getHasMoved() const;
+	void setHasMoved(bool moved);
 	void setPosition(Position newPos);
 	virtual String getEmoji() const = 0;
 	virtual void calculateValidMoves(const Board* board) = 0;
@@ -83,6 +86,9 @@ class Queen : public Piece {
 };
 
 class King : public Piece {
+  private:
+	bool canLongCastle, canShortCastle;
+	static void castleRook(Board* board, int row, int fromCol, int toCol);
   public:
 	using Piece::Piece;
 	String getEmoji() const override;
