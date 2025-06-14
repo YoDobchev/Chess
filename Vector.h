@@ -78,6 +78,15 @@ template <typename T> class Vector {
 		}
 	}
 
+	void erase(size_t index) {
+		if (index >= size_) return;
+
+		for (size_t i = index; i + 1 < size_; ++i) {
+			data_[i] = data_[i + 1];
+		}
+		--size_;
+	}
+
 	T& operator[](size_t index) { return data_[index]; }
 
 	const T& operator[](size_t index) const { return data_[index]; }

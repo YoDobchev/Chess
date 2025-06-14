@@ -10,18 +10,29 @@ void Square::setSpecialColor(const int color) { specialColor = color; }
 
 void Square::setPiece(Piece* piece) { this->piece = piece; }
 
+bool Square::getAttackedBy(Player player) const { return isAttackedBy[static_cast<int>(player)]; }
+
+void Square::setAttackedBy(Player player) { isAttackedBy[static_cast<int>(player)] = true; }
+
+void Square::clearAttackedBy() {
+	for (int i = 0; i < 2; ++i) {
+		isAttackedBy[i] = false;
+	}
+}
+
 Piece* Square::getPiece() const { return piece; }
 
 Board::Board() : enPassantSquare({-1, -1}) {
 	for (int i = 1; i < 8; ++i) {
-		board[1][i].setPiece(new Pawn(Player::WHITE, {1, i}));
+		// board[1][i].setPiece(new Pawn(Player::WHITE, {1, i}));
 		board[6][i].setPiece(new Pawn(Player::BLACK, {6, i}));
 	}
 
 	Player players[2] = {Player::WHITE, Player::BLACK};
 	int backRanks[2] = {0, 7};
 
-	board[4][2].setPiece(new Pawn(Player::WHITE, {4, 2}));
+	board[3][2].setPiece(new King(Player::WHITE, {3, 2}));
+	board[3][4].setPiece(new King(Player::BLACK, {3, 4}));
 	for (int p = 0; p < 2; ++p) {
 		int row = backRanks[p];
 		Player color = players[p];
@@ -43,22 +54,55 @@ Piece* Board::getPieceAtPos(Position pos) const {
 	return board[pos.row][pos.col].getPiece();
 }
 
-bool Board::movePiece(const Position from, const Position to, const Player playerTurn, String& error) {
-	std::cout << enPassantSquare.row << " " << enPassantSquare.col << "\n";
+void Board::setCheckExists(bool exists) { checkExists = exists; }
+bool Board::getCheckExists() const { return checkExists; }
 
+void Board::calculateSquares() {
 	for (int i = 0; i < 8; ++i) {
 		for (int j = 0; j < 8; ++j) {
-			if (board[i][j].getPiece()) {
-				board[i][j].getPiece()->calculateValidMoves(this);
+			Piece* piece = board[i][j].getPiece();
+			if (piece) {
+				piece->calculateValidMoves(this);
+				piece->setAttackedSquares(this);
 			}
 		}
 	}
+
+	// Calculate valid moves for every king again
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 8; ++j) {
+			Piece* piece = board[i][j].getPiece();
+			if (piece && dynamic_cast<King*>(piece)) {
+				piece->calculateValidMoves(this);
+			}
+		}
+	}
+}
+
+void Board::clearAttackedSquares() {
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 8; ++j) {
+			board[i][j].clearAttackedBy();
+		}
+	}
+}
+
+bool Board::movePiece(const Position from, const Position to, const Player playerTurn, String& error) {
+	std::cout << enPassantSquare.row << " " << enPassantSquare.col << "\n";
+
+	calculateSquares();
 
 	Piece* pieceToMove = getPieceAtPos(from);
 	if (!pieceToMove) {
 		error = "No piece at the source position!";
 		return false;
 	}
+
+	if (checkExists && dynamic_cast<King*>(pieceToMove) == nullptr) {
+		error = "You cannot move a piece while in check!";
+		return false;
+	}
+
 	if (pieceToMove->getColor() != playerTurn) {
 		error = "It's not your turn!";
 		return false;
@@ -79,6 +123,10 @@ bool Board::movePiece(const Position from, const Position to, const Player playe
 	if (enPassantSquare.row != -1) enPassantSquare = {-1, -1};
 
 	pieceToMove->move(to, this, error);
+
+	setCheckExists(false);
+
+	clearAttackedSquares();
 
 	return true;
 }

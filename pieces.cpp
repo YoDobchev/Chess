@@ -43,6 +43,41 @@ void Piece::addValidMovesBasedOnDirections(const Board* board, const Vector<Dire
 	}
 }
 
+void Piece::setAttackedSquares(Board* board) const {
+	for (int i = 0; i < validMoves.size(); ++i) {
+		Position movePos = validMoves[i];
+		if (movePos.isOutOfBounds()) continue;
+		(*board)[movePos.row][movePos.col].setAttackedBy(color);
+		if (dynamic_cast<King*>(board->getPieceAtPos(movePos))) board->setCheckExists(true);
+	}
+}
+
+void Pawn::setAttackedSquares(Board* board) const {
+	const int direction = (color == Player::WHITE) ? 1 : -1;
+	const int colOffsets[2] = {-1, 1};
+
+	for (int i = 0; i < 2; ++i) {
+		Position capturePos = {pos.row + direction, pos.col + colOffsets[i]};
+		if (capturePos.isOutOfBounds()) continue;
+		Piece* targetPiece = board->getPieceAtPos(capturePos);
+		(*board)[capturePos.row][capturePos.col].setAttackedBy(color);
+		if (dynamic_cast<King*>(targetPiece)) board->setCheckExists(true);
+
+	}
+}
+
+void King::setAttackedSquares(Board* board) const {
+	const Direction kingMoves[] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+
+	for (int i = 0; i < 8; ++i) {
+		Position next = pos;
+		next.move(kingMoves[i]);
+		if (!next.isOutOfBounds()) {
+			(*board)[next.row][next.col].setAttackedBy(color);
+		}
+	}
+}
+
 String Pawn::getEmoji() const { return color == Player::WHITE ? "♙" : "♟"; }
 
 String Rook::getEmoji() const { return color == Player::WHITE ? "♖" : "♜"; }
@@ -55,7 +90,7 @@ String Queen::getEmoji() const { return color == Player::WHITE ? "♕" : "♛"; 
 
 String King::getEmoji() const { return color == Player::WHITE ? "♔" : "♚"; }
 
-void Pawn::calculateValidMoves(const Board* board) {
+void Pawn::calculateValidMoves(Board* board) {
 	validMoves.clear();
 	const int direction = (color == Player::WHITE) ? 1 : -1;
 	const int startRow = (color == Player::WHITE) ? 1 : 6;
@@ -81,14 +116,12 @@ void Pawn::calculateValidMoves(const Board* board) {
 			validMoves.push_back(capturePos);
 		}
 		if (capturePos == board->enPassantSquare) {
-			// if (board->getPieceAtPos(enPassantCapturePos) == nullptr) {
 			validMoves.push_back(capturePos);
-			// }
 		}
 	}
 }
 
-void Rook::calculateValidMoves(const Board* board) {
+void Rook::calculateValidMoves(Board* board) {
 	validMoves.clear();
 	Vector<Direction> directions;
 	directions.push_back(UP);
@@ -98,7 +131,7 @@ void Rook::calculateValidMoves(const Board* board) {
 	addValidMovesBasedOnDirections(board, directions);
 }
 
-void Bishop::calculateValidMoves(const Board* board) {
+void Bishop::calculateValidMoves(Board* board) {
 	validMoves.clear();
 	Vector<Direction> directions;
 	directions.push_back(UP_LEFT);
@@ -108,7 +141,7 @@ void Bishop::calculateValidMoves(const Board* board) {
 	addValidMovesBasedOnDirections(board, directions);
 }
 
-void Knight::calculateValidMoves(const Board* board) {
+void Knight::calculateValidMoves(Board* board) {
 	validMoves.clear();
 	const Direction knightMoves[] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
 
@@ -124,7 +157,7 @@ void Knight::calculateValidMoves(const Board* board) {
 	}
 }
 
-void Queen::calculateValidMoves(const Board* board) {
+void Queen::calculateValidMoves(Board* board) {
 	validMoves.clear();
 	Vector<Direction> directions;
 	directions.push_back(UP);
@@ -138,7 +171,7 @@ void Queen::calculateValidMoves(const Board* board) {
 	addValidMovesBasedOnDirections(board, directions);
 }
 
-void King::calculateValidMoves(const Board* board) {
+void King::calculateValidMoves(Board* board) {
 	validMoves.clear();
 	const Direction kingMoves[] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
@@ -168,6 +201,19 @@ void King::calculateValidMoves(const Board* board) {
 			canShortCastle = true;
 		}
 	}
+
+	Player opponent = !color;
+
+	for (int i = 0; i < validMoves.size();) {
+		Position dest = validMoves[i];
+		bool attacked = (*board)[dest.row][dest.col].getAttackedBy(opponent);
+
+		if (attacked) {
+			validMoves.erase(i);
+		} else {
+			++i;
+		}
+	}
 }
 
 void Piece::move(const Position to, Board* board, String& error) {
@@ -190,7 +236,7 @@ void Pawn::move(const Position to, Board* board, String& error) {
 		if (capturePos.isOutOfBounds()) continue;
 		if (capturePos == board->oldEnPassantSquare) {
 			Position enPassantCapturePos = {to.row - direction, to.col};
-			board->operator[](enPassantCapturePos.row)[enPassantCapturePos.col].setPiece(nullptr);
+			(*board)[enPassantCapturePos.row][enPassantCapturePos.col].setPiece(nullptr);
 		}
 	}
 
@@ -211,13 +257,10 @@ void King::castleRook(Board* board, int row, int fromCol, int toCol) {
 void King::move(const Position to, Board* board, String& error) {
 	bool isShort = canShortCastle && to == Position{pos.row, pos.col + 2};
 	bool isLong = canLongCastle && to == Position{pos.row, pos.col - 2};
-    
-    
 	if (isShort) {
-        std::cout << "SHOOORT";
-        castleRook(board, to.row, pos.col + 3, pos.col + 1);
+		castleRook(board, to.row, pos.col + 3, pos.col + 1);
 	} else if (isLong) {
-        castleRook(board, to.row, pos.col - 4, pos.col - 1);
+		castleRook(board, to.row, pos.col - 4, pos.col - 1);
 	}
-    Piece::move(to, board, error);
+	Piece::move(to, board, error);
 }

@@ -32,7 +32,9 @@ void GameState::printBoard() {
 
 		for (int j = 7; j >= 0; --j) {
 			Square& square = board->operator[](i)[j];
-			if (square.getSpecialColor())
+			if (square.getAttackedBy(Player::WHITE) || square.getAttackedBy(Player::BLACK))
+				std::cout << "\033[108m";
+			else if (square.getSpecialColor())
 				std::cout << "\033[" << square.getSpecialColor() << "m";
 			else if ((i + j) % 2 == 0)
 				std::cout << "\033[107m";
@@ -77,10 +79,11 @@ void GameState::executeCommand(const String& inputStr) {
 		// 	return;
 		// }
 
-		// std::cout << "Moving from " << fromPos.row << " " << fromPos.col << " to " << toPos.row << " " << toPos.col << std::endl;
+		// std::cout << "Moving from " << fromPos.row << " " << fromPos.col << " to " << toPos.row << " " << toPos.col
+		// << std::endl;
 
-		// if (board->movePiece(fromPos, toPos, playerTurn, error)) playerTurn = !playerTurn;
-		board->movePiece(fromPos, toPos, playerTurn, error);
+		if (board->movePiece(fromPos, toPos, playerTurn, error)) playerTurn = !playerTurn;
+		// board->movePiece(fromPos, toPos, playerTurn, error);
 	} else if (cmd == "mark") {
 		String posStr;
 		InputHandler::token(posStr, inputStr, p);
@@ -91,7 +94,8 @@ void GameState::executeCommand(const String& inputStr) {
 			error = "No piece at the selected position!";
 			return;
 		}
-		piece->calculateValidMoves(board);
+		// piece->calculateValidMoves(board);
+		board->calculateSquares();
 		const Vector<Position>& squaresToMark = piece->getValidMoves();
 
 		for (int i = 0; i < squaresToMark.size(); ++i) {
@@ -118,7 +122,7 @@ void GameState::update() {
 }
 
 void GameState::start() {
-	while (true) {
+	while (!gameOver) {
 		update();
 	}
 }

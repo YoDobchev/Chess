@@ -25,8 +25,9 @@ class Piece {
 	void setHasMoved(bool moved);
 	void setPosition(Position newPos);
 	virtual String getEmoji() const = 0;
-	virtual void calculateValidMoves(const Board* board) = 0;
+	virtual void calculateValidMoves(Board* board) = 0;
 	bool checkIfValidMove(const Position to, const Board* board, String& error);
+	virtual void setAttackedSquares(Board* board) const;
 	virtual void move(const Position to, Board* board, String& error);
 };
 
@@ -36,7 +37,8 @@ class Pawn : public Piece {
 	using Piece::Piece;
 	String getEmoji() const override;
 
-	void calculateValidMoves(const Board* board) override;
+	void calculateValidMoves(Board* board) override;
+	void setAttackedSquares(Board* board) const override;
 	void move(const Position to, Board* board, String& error) override;
 	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
@@ -46,9 +48,10 @@ class Rook : public Piece {
 	using Piece::Piece;
 	String getEmoji() const override;
 
-	void calculateValidMoves(const Board* board) override;
+	void calculateValidMoves(Board* board) override;
 	// void move(const Position to, Board* board, String& error) override;
 	using Piece::move;
+	using Piece::setAttackedSquares;
 	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
 
@@ -57,9 +60,10 @@ class Bishop : public Piece {
 	using Piece::Piece;
 	String getEmoji() const override;
 
-	void calculateValidMoves(const Board* board) override;
+	void calculateValidMoves(Board* board) override;
 	// void move(const Position to, Board* board, String& error) override;
 	using Piece::move;
+	using Piece::setAttackedSquares;
 	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
 
@@ -68,9 +72,10 @@ class Knight : public Piece {
 	using Piece::Piece;
 	String getEmoji() const override;
 
-	void calculateValidMoves(const Board* board) override;
+	void calculateValidMoves(Board* board) override;
 	// void move(const Position to, Board* board, String& error) override;
 	using Piece::move;
+	using Piece::setAttackedSquares;
 	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
 
@@ -79,9 +84,10 @@ class Queen : public Piece {
 	using Piece::Piece;
 	String getEmoji() const override;
 
-	void calculateValidMoves(const Board* board) override;
+	void calculateValidMoves(Board* board) override;
 	// void move(const Position to, Board* board, String& error) override;
 	using Piece::move;
+	using Piece::setAttackedSquares;
 	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
 
@@ -89,11 +95,13 @@ class King : public Piece {
   private:
 	bool canLongCastle, canShortCastle;
 	static void castleRook(Board* board, int row, int fromCol, int toCol);
+
   public:
 	using Piece::Piece;
 	String getEmoji() const override;
 
-	void calculateValidMoves(const Board* board) override;
+	void calculateValidMoves(Board* board) override;
+	void setAttackedSquares(Board* board) const override;
 	void move(const Position to, Board* board, String& error) override;
 	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
