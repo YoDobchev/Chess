@@ -89,25 +89,7 @@ void GameState::executeCommand(const String& inputStr) {
 		}
 	}
 
-	if (cmd == "move") {
-		String from, to;
-		InputHandler::token(from, inputStr, p);
-		InputHandler::token(to, inputStr, p);
-		Position fromPos = {InputHandler::charIntToBoardIndex(from[1]), InputHandler::charToBoardIndex(from[0])};
-		Position toPos = {InputHandler::charIntToBoardIndex(to[1]), InputHandler::charToBoardIndex(to[0])};
-
-		// if (board->getPieceAtPos(fromPos)->getColor() != playerTurn) {
-		// 	error = "It's not your turn";
-		// 	return;
-		// }
-
-		if (board->movePiece(fromPos, toPos, playerTurn, error)) playerTurn = !playerTurn;
-
-		if (lastSixMoves.size() == 6) lastSixMoves.erase(0);
-		lastSixMoves.push_back(from + to);
-
-		checkForPawnPromotion();
-	} else if (cmd == "mark") {
+	if (cmd == "mark") {
 		String posStr;
 		InputHandler::token(posStr, inputStr, p);
 		Position pos = {InputHandler::charIntToBoardIndex(posStr[1]), InputHandler::charToBoardIndex(posStr[0])};
@@ -168,6 +150,20 @@ void GameState::executeCommand(const String& inputStr) {
 
 		delete board;
 		board = new Board(boardData);
+	} else {
+		// Move
+		String& from = cmd;
+		String to;
+		InputHandler::token(to, inputStr, p);
+		Position fromPos = {InputHandler::charIntToBoardIndex(from[1]), InputHandler::charToBoardIndex(from[0])};
+		Position toPos = {InputHandler::charIntToBoardIndex(to[1]), InputHandler::charToBoardIndex(to[0])};
+
+		if (board->movePiece(fromPos, toPos, playerTurn, error)) playerTurn = !playerTurn;
+
+		if (lastSixMoves.size() == 6) lastSixMoves.erase(0);
+		lastSixMoves.push_back(from + to);
+
+		checkForPawnPromotion();
 	}
 }
 

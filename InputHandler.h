@@ -34,11 +34,13 @@ class InputHandler {
 	}
 
 	static bool isExistingCommand(String& inputStr, String& error) {
-		const String validCmds[] = {"move", "mark", "save", "load"};
+		const String validCmds[] = {"mark", "save", "load"};
 		String cmd;
 		int p = 0;
 
 		token(cmd, inputStr, p);
+
+		if (cmd.size() == 2) return true;
 
 		for (int i = 0; i < sizeof(validCmds) / sizeof(validCmds[0]); ++i) {
 			if (cmd == validCmds[i]) return true;
@@ -54,24 +56,7 @@ class InputHandler {
 		String cmd;
 		token(cmd, inputStr, p);
 
-		if (cmd == "move") {
-			String from, to;
-			token(from, inputStr, p);
-			token(to, inputStr, p);
-
-			if (from.empty() || to.empty()) {
-				error = "Missing parameters for move command!";
-				return false;
-			}
-			if (!isValidCoordinate(from) || !isValidCoordinate(to)) {
-				error = "Invalid move coordinates!";
-				return false;
-			}
-			if (from[0] == to[0] && from[1] == to[1]) {
-				error = "Move cannot be the same square!";
-				return false;
-			}
-		} else if (cmd == "mark") {
+		if (cmd == "mark") {
 			String pos;
 			token(pos, inputStr, p);
 			if (pos.empty()) {
@@ -88,6 +73,24 @@ class InputHandler {
 			token(filename, inputStr, p);
 			if (filename.empty()) {
 				error = "Filename cannot be empty!";
+				return false;
+			}
+		} else {
+			// Move
+			String& from = cmd;
+			String to;
+			token(to, inputStr, p);
+
+			if (from.empty() || to.empty()) {
+				error = "Missing parameters for move command!";
+				return false;
+			}
+			if (!isValidCoordinate(from) || !isValidCoordinate(to)) {
+				error = "Invalid move coordinates!";
+				return false;
+			}
+			if (from[0] == to[0] && from[1] == to[1]) {
+				error = "Move cannot be the same square!";
 				return false;
 			}
 		}
