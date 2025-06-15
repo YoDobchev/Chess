@@ -85,7 +85,6 @@ template <typename T> class Vector {
 			data_[i] = data_[i + 1];
 		}
 		--size_;
-		data_[size_].~T();
 	}
 
 	T& operator[](size_t index) { return data_[index]; }
