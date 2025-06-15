@@ -65,6 +65,7 @@ void GameState::checkForPawnPromotion() {
 		Piece* piece = (*board)[backrank][i].getPiece();
 		if (piece && dynamic_cast<Pawn*>(piece)) {
 			if (piece->getColor() == !playerTurn) {
+				printBoard();
 				String promotionChoice;
 				while (true) {
 					std::cout << "Pawn promotion available! Choose a piece (q, r, b, n): ";
