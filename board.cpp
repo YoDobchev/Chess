@@ -131,6 +131,10 @@ void Board::setCheckExists(int exists) { checkExists = exists; }
 int Board::getCheckExists() const { return checkExists; }
 
 void Board::calculateSquares() {
+	clearAttackedSquares();
+	positionsToBlockCheck.clear();
+	setCheckExists(NO_CHECK);
+
 	for (int i = 0; i < BOARD_SIZE; ++i) {
 		for (int j = 0; j < BOARD_SIZE; ++j) {
 			Piece* piece = board[i][j].getPiece();
@@ -139,8 +143,17 @@ void Board::calculateSquares() {
 			piece->setIsPinned(false);
 			piece->calculateMoves(this);
 			piece->setAttackedSquares(this);
-			if (checkExists != -1)
-				piece->removeValidMovesThatDoNotProtectKing(this->positionsToBlockCheck, this->checkExists);
+		}
+	}
+
+	if (checkExists != NO_CHECK) {
+		for (int i = 0; i < BOARD_SIZE; ++i) {
+			for (int j = 0; j < BOARD_SIZE; ++j) {
+				Piece* piece = board[i][j].getPiece();
+				if (!piece) continue;
+
+				piece->removeValidMovesThatDoNotProtectKing(positionsToBlockCheck, checkExists);
+			}
 		}
 	}
 
@@ -194,11 +207,6 @@ bool Board::movePiece(const Position from, const Position to, const Player playe
 	if (enPassantSquare.row != -1) setEnPassantSquare({-1, -1});
 
 	pieceToMove->move(to, this);
-
-	setCheckExists(NO_CHECK);
-	positionsToBlockCheck.clear();
-
-	clearAttackedSquares();
 
 	return true;
 }
