@@ -27,9 +27,9 @@ class Piece {
 	virtual String getEmoji() const = 0;
 	virtual void calculateValidMoves(Board* board) = 0;
 	virtual char serialize() const = 0;
-	bool checkIfValidMove(const Position to, const Board* board, String& error);
+	bool checkIfValidMove(const Position to, const Board* board);
 	virtual void setAttackedSquares(Board* board) const;
-	virtual void move(const Position to, Board* board, String& error);
+	virtual void move(const Position to, Board* board);
 };
 
 class Pawn : public Piece {
@@ -41,7 +41,7 @@ class Pawn : public Piece {
 
 	void calculateValidMoves(Board* board) override;
 	void setAttackedSquares(Board* board) const override;
-	void move(const Position to, Board* board, String& error) override;
+	void move(const Position to, Board* board) override;
 };
 
 class Rook : public Piece {
@@ -103,7 +103,7 @@ class King : public Piece {
 
 	void calculateValidMoves(Board* board) override;
 	void setAttackedSquares(Board* board) const override;
-	void move(const Position to, Board* board, String& error) override;
+	void move(const Position to, Board* board) override;
 };
 
 #endif

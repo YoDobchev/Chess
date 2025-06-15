@@ -13,7 +13,7 @@ void Piece::setHasMoved(bool moved) { hasMoved = moved; }
 
 void Piece::setPosition(Position newPos) { pos = newPos; }
 
-bool Piece::checkIfValidMove(const Position to, const Board* board, String& error) {
+bool Piece::checkIfValidMove(const Position to, const Board* board) {
 	for (int i = 0; i < validMoves.size(); ++i) {
 		if (validMoves[i] == to) return true;
 	}
@@ -263,7 +263,7 @@ void King::calculateValidMoves(Board* board) {
 	}
 }
 
-void Piece::move(const Position to, Board* board, String& error) {
+void Piece::move(const Position to, Board* board) {
 	Position from = pos;
 	this->setPosition(to);
 	(*board)[to.row][to.col].setPiece(this);
@@ -271,7 +271,7 @@ void Piece::move(const Position to, Board* board, String& error) {
 	hasMoved = true;
 }
 
-void Pawn::move(const Position to, Board* board, String& error) {
+void Pawn::move(const Position to, Board* board) {
 	const int direction = (color == Player::WHITE) ? 1 : -1;
 	if (to.row == pos.row + direction * 2) {
 		board->setEnPassantSquare({pos.row + direction, pos.col});
@@ -288,7 +288,7 @@ void Pawn::move(const Position to, Board* board, String& error) {
 		}
 	}
 
-	Piece::move(to, board, error);
+	Piece::move(to, board);
 }
 
 void King::castleRook(Board* board, int row, int fromCol, int toCol) {
@@ -302,7 +302,7 @@ void King::castleRook(Board* board, int row, int fromCol, int toCol) {
 	rook->setHasMoved(true);
 }
 
-void King::move(const Position to, Board* board, String& error) {
+void King::move(const Position to, Board* board) {
 	bool isShort = canShortCastle && to == Position{pos.row, pos.col + 2};
 	bool isLong = canLongCastle && to == Position{pos.row, pos.col - 2};
 	if (isShort) {
@@ -310,7 +310,7 @@ void King::move(const Position to, Board* board, String& error) {
 	} else if (isLong) {
 		castleRook(board, to.row, pos.col - 4, pos.col - 1);
 	}
-	Piece::move(to, board, error);
+	Piece::move(to, board);
 }
 
 char Pawn::serialize() const { return (color == Player::WHITE) ? 'p' : 'P'; }

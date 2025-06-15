@@ -179,7 +179,7 @@ bool Board::movePiece(const Position from, const Position to, const Player playe
 		return false;
 	}
 
-	if (!pieceToMove->checkIfValidMove(to, this, error)) {
+	if (!pieceToMove->checkIfValidMove(to, this)) {
 		error = "Invalid move spot!";
 		return false;
 	}
@@ -187,7 +187,7 @@ bool Board::movePiece(const Position from, const Position to, const Player playe
 	oldEnPassantSquare = enPassantSquare;
 	if (enPassantSquare.row != -1) setEnPassantSquare({-1, -1});
 
-	pieceToMove->move(to, this, error);
+	pieceToMove->move(to, this);
 
 	setCheckExists(-1);
 
