@@ -21,6 +21,9 @@ void GameState::drawSquare(Position pos) {
 }
 
 void GameState::printBoard() {
+	// Clear
+	std::cout << "\033[2J\033[H" << std::flush;
+
 	std::cout << "  a b c d e f g h         h g f e d c b a\n";
 
 	for (int i = 0; i < BOARD_SIZE; ++i) {
@@ -148,6 +151,8 @@ void GameState::executeCommand(const String& inputStr) {
 		board = new Board(boardData);
 	} else if (cmd == "quit") {
 		quit = true;
+	} else if (cmd == "help") {
+		error = "Available commands: <from> <to>(move), mark <pos>, save <filename>, load <filename>, help, quit";
 	} else {
 		// Move
 		String& from = cmd;

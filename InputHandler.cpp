@@ -28,7 +28,7 @@ void InputHandler::token(String& dest, const String& str, int& p) {
 }
 
 bool InputHandler::isExistingCommand(String& inputStr, String& error) {
-	const String validCmds[] = {"mark", "save", "load", "quit"};
+	const String validCmds[] = {"mark", "save", "load", "help", "quit"};
 	String cmd;
 	int p = 0;
 
