@@ -23,7 +23,7 @@ void Square::clearAttackedBy() {
 Piece* Square::getPiece() const { return piece; }
 
 Board::Board() : enPassantSquare({-1, -1}), checkExists(-1) {
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
 		setPiece(new Pawn(Player::WHITE), {1, i});
 		setPiece(new Pawn(Player::BLACK), {6, i});
 	}
@@ -47,8 +47,8 @@ Board::Board() : enPassantSquare({-1, -1}), checkExists(-1) {
 }
 
 Board::Board(const String& serializedData) : enPassantSquare({-1, -1}), checkExists(-1) {
-	for (int i = 0; i < 8; ++i) {
-		for (int j = 0; j < 8; ++j) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
+		for (int j = 0; j < BOARD_SIZE; ++j) {
 			char pieceChar = serializedData[i * 9 + j];
 			if (pieceChar == '\0' || pieceChar == '\n') continue;
 			if (pieceChar != '*') {
@@ -83,8 +83,8 @@ Square* Board::operator[](const int row) { return board[row]; }
 
 String Board::serialize() const {
 	String result;
-	for (int i = 0; i < 8; ++i) {
-		for (int j = 0; j < 8; ++j) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
+		for (int j = 0; j < BOARD_SIZE; ++j) {
 			Piece* piece = board[i][j].getPiece();
 			if (piece) {
 				result.push_back(piece->serialize());
@@ -112,8 +112,8 @@ void Board::setCheckExists(int exists) { checkExists = exists; }
 int Board::getCheckExists() const { return checkExists; }
 
 void Board::calculateSquares() {
-	for (int i = 0; i < 8; ++i) {
-		for (int j = 0; j < 8; ++j) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
+		for (int j = 0; j < BOARD_SIZE; ++j) {
 			Piece* piece = board[i][j].getPiece();
 			if (!piece) continue;
 
@@ -123,8 +123,8 @@ void Board::calculateSquares() {
 	}
 
 	// Calculate valid moves for both kings again
-	for (int i = 0; i < 8; ++i) {
-		for (int j = 0; j < 8; ++j) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
+		for (int j = 0; j < BOARD_SIZE; ++j) {
 			Piece* piece = board[i][j].getPiece();
 			if (!piece) continue;
 
@@ -136,8 +136,8 @@ void Board::calculateSquares() {
 }
 
 void Board::clearAttackedSquares() {
-	for (int i = 0; i < 8; ++i) {
-		for (int j = 0; j < 8; ++j) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
+		for (int j = 0; j < BOARD_SIZE; ++j) {
 			board[i][j].clearAttackedBy();
 		}
 	}

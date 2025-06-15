@@ -15,7 +15,7 @@ Position& Position::move(Direction dir) {
 }
 
 bool Position::isOutOfBounds() const {
-    return this->row < 0 || this->row >= 8 || this->col < 0 || this->col >= 8;
+    return this->row < 0 || this->row >= BOARD_SIZE || this->col < 0 || this->col >= BOARD_SIZE;
 }
 
 Player operator!(Player p) { return (p == Player::WHITE) ? Player::BLACK : Player::WHITE; }

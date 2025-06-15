@@ -26,7 +26,7 @@ class Square {
 
 class Board {
   private:
-	Square board[8][8];
+	Square board[BOARD_SIZE][BOARD_SIZE];
 	int checkExists;
 
   public:

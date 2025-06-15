@@ -2,6 +2,9 @@
 #define TYPES_H
 #include <iostream>
 
+const int BOARD_SIZE = 8;
+const char BOARD_SIZE_CHAR = '8';
+
 struct Direction {
 	int dRow;
 	int dCol;

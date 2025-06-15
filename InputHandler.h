@@ -2,6 +2,7 @@
 #define INPUTHANDLER_H
 
 #include "String.h"
+#include "Types.h"
 
 class InputHandler {
   private:
@@ -9,7 +10,7 @@ class InputHandler {
 		if (coord.size() != 2) return false;
 		char col = coord[0];
 		char row = coord[1];
-		return (col >= 'a' && col <= 'h') && (row >= '1' && row <= '8');
+		return (col >= 'a' && col <= 'h') && (row >= '1' && row <= BOARD_SIZE_CHAR);
 	}
 
   public:
@@ -20,7 +21,7 @@ class InputHandler {
 	}
 
 	static int charIntToBoardIndex(char c) {
-		if (c >= '1' && c <= '8') return c - '1';
+		if (c >= '1' && c <= BOARD_SIZE_CHAR) return c - '1';
 		return 0;
 	}
 

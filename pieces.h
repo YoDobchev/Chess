@@ -42,7 +42,6 @@ class Pawn : public Piece {
 	void calculateValidMoves(Board* board) override;
 	void setAttackedSquares(Board* board) const override;
 	void move(const Position to, Board* board, String& error) override;
-	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
 
 class Rook : public Piece {
@@ -52,10 +51,8 @@ class Rook : public Piece {
 	char serialize() const override;
 
 	void calculateValidMoves(Board* board) override;
-	// void move(const Position to, Board* board, String& error) override;
 	using Piece::move;
 	using Piece::setAttackedSquares;
-	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
 
 class Bishop : public Piece {
@@ -65,10 +62,8 @@ class Bishop : public Piece {
 	char serialize() const override;
 
 	void calculateValidMoves(Board* board) override;
-	// void move(const Position to, Board* board, String& error) override;
 	using Piece::move;
 	using Piece::setAttackedSquares;
-	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
 
 class Knight : public Piece {
@@ -78,10 +73,8 @@ class Knight : public Piece {
 	char serialize() const override;
 
 	void calculateValidMoves(Board* board) override;
-	// void move(const Position to, Board* board, String& error) override;
 	using Piece::move;
 	using Piece::setAttackedSquares;
-	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
 
 class Queen : public Piece {
@@ -91,10 +84,8 @@ class Queen : public Piece {
 	char serialize() const override;
 
 	void calculateValidMoves(Board* board) override;
-	// void move(const Position to, Board* board, String& error) override;
 	using Piece::move;
 	using Piece::setAttackedSquares;
-	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
 
 class King : public Piece {
@@ -110,7 +101,6 @@ class King : public Piece {
 	void calculateValidMoves(Board* board) override;
 	void setAttackedSquares(Board* board) const override;
 	void move(const Position to, Board* board, String& error) override;
-	// bool checkIfValidMove(const Position to, const Board* board, String& error) override;
 };
 
 #endif
