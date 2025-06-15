@@ -23,16 +23,16 @@ void GameState::drawSquare(Position pos) {
 void GameState::printBoard() {
 	std::cout << "  a b c d e f g h         h g f e d c b a\n";
 
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
 		int rowLeft = 7 - i;
 		int rowRight = i;
 
-		std::cout << (8 - i) << ' ';
+		std::cout << (BOARD_SIZE - i) << ' ';
 
-		for (int j = 0; j < 8; ++j)
+		for (int j = 0; j < BOARD_SIZE; ++j)
 			drawSquare({rowLeft, j});
 
-		std::cout << ' ' << (8 - i) << "    " << (i + 1) << ' ';
+		std::cout << ' ' << (BOARD_SIZE - i) << "    " << (i + 1) << ' ';
 
 		for (int j = 7; j >= 0; --j)
 			drawSquare({rowRight, j});
@@ -46,7 +46,7 @@ void GameState::printBoard() {
 void GameState::checkForPawnPromotion() {
 	int backrank = (!playerTurn == Player::WHITE) ? 7 : 0;
 	std::cout << backrank << std::endl;
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
 		Piece* piece = (*board)[backrank][i].getPiece();
 		if (piece && dynamic_cast<Pawn*>(piece)) {
 			if (piece->getColor() == !playerTurn) {
@@ -81,8 +81,8 @@ void GameState::executeCommand(const String& inputStr) {
 
 	InputHandler::token(cmd, inputStr, p);
 
-	for (int i = 0; i < 8; ++i) {
-		for (int j = 0; j < 8; ++j) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
+		for (int j = 0; j < BOARD_SIZE; ++j) {
 			(*board)[i][j].setSpecialColor(0);
 		}
 	}
@@ -135,7 +135,7 @@ void GameState::executeCommand(const String& inputStr) {
 		}
 		inFile.close();
 
-		constexpr size_t expectedSize = 8 * 9 + 1;
+		constexpr size_t expectedSize = BOARD_SIZE * 9 + 1;
 		if (boardData.size() != expectedSize) {
 			error = "Invalid file format!";
 			return;
@@ -168,8 +168,8 @@ bool GameState::hasGameEnded() {
 	bool stalemate = true;
 	bool checkmate = false;
 	bool repetition = false;
-	for (int i = 0; i < 8; ++i) {
-		for (int j = 0; j < 8; ++j) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
+		for (int j = 0; j < BOARD_SIZE; ++j) {
 			Piece* piece = (*board)[i][j].getPiece();
 			if (!piece) continue;
 
