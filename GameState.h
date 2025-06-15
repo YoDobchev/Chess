@@ -8,7 +8,7 @@
 
 class GameState {
   private:
-	bool gameOver;
+	bool gameOver, quit;
 	Player playerTurn;
 	Board* board;
 	String error;

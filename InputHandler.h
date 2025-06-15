@@ -35,7 +35,7 @@ class InputHandler {
 	}
 
 	static bool isExistingCommand(String& inputStr, String& error) {
-		const String validCmds[] = {"mark", "save", "load"};
+		const String validCmds[] = {"mark", "save", "load", "quit"};
 		String cmd;
 		int p = 0;
 
@@ -76,7 +76,7 @@ class InputHandler {
 				error = "Filename cannot be empty!";
 				return false;
 			}
-		} else {
+		} else if (cmd.size() == 2) {
 			// Move
 			String& from = cmd;
 			String to;

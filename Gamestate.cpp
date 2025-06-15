@@ -45,7 +45,6 @@ void GameState::printBoard() {
 
 void GameState::checkForPawnPromotion() {
 	int backrank = (!playerTurn == Player::WHITE) ? 7 : 0;
-	std::cout << backrank << std::endl;
 	for (int i = 0; i < BOARD_SIZE; ++i) {
 		Piece* piece = (*board)[backrank][i].getPiece();
 		if (piece && dynamic_cast<Pawn*>(piece)) {
@@ -55,16 +54,16 @@ void GameState::checkForPawnPromotion() {
 					std::cout << "Pawn promotion available! Choose a piece (q, r, b, n): ";
 					getline(std::cin, promotionChoice);
 					if (promotionChoice == "q") {
-						(*board).setPiece(new Queen(playerTurn), {backrank, i});
+						(*board).setPiece(new Queen(!playerTurn), {backrank, i});
 						break;
 					} else if (promotionChoice == "r") {
-						(*board).setPiece(new Rook(playerTurn), {backrank, i});
+						(*board).setPiece(new Rook(!playerTurn), {backrank, i});
 						break;
 					} else if (promotionChoice == "b") {
-						(*board).setPiece(new Bishop(playerTurn), {backrank, i});
+						(*board).setPiece(new Bishop(!playerTurn), {backrank, i});
 						break;
 					} else if (promotionChoice == "n") {
-						(*board).setPiece(new Knight(playerTurn), {backrank, i});
+						(*board).setPiece(new Knight(!playerTurn), {backrank, i});
 						break;
 					} else {
 						std::cout << "Invalid choice!" << std::endl;
@@ -147,6 +146,8 @@ void GameState::executeCommand(const String& inputStr) {
 
 		delete board;
 		board = new Board(boardData);
+	} else if (cmd == "quit") {
+		quit = true;
 	} else {
 		// Move
 		String& from = cmd;
@@ -242,7 +243,18 @@ void GameState::update() {
 }
 
 void GameState::start() {
-	while (!gameOver) {
-		update();
+	while (!quit) {
+		while (!gameOver && !quit) {
+			update();
+		}
+
+		if (!quit) {
+			std::cout << "Press Enter for new game...";
+			std::cin.get();
+			delete board;
+			board = new Board();
+			playerTurn = Player::WHITE;
+			gameOver = false;
+		}
 	}
 }
