@@ -259,6 +259,10 @@ void GameState::update() {
 }
 
 void GameState::start() {
+#ifdef _WIN32
+	enableANSI();
+#endif
+
 	while (!quit) {
 		while (!gameOver && !quit) {
 			update();
