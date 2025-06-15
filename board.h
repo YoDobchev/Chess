@@ -28,15 +28,17 @@ class Board {
   private:
 	Square board[BOARD_SIZE][BOARD_SIZE];
 	int checkExists;
+	Position enPassantSquare, oldEnPassantSquare;
 
   public:
 	// Used for clearing the en passant square after a move
-	Position enPassantSquare, oldEnPassantSquare;
 	Board();
 	Board(const String& serializedData);
 	Square* operator[](const int row);
 	String serialize() const;
 
+	void setEnPassantSquare(const Position pos);
+	Position getEnPassantSquare() const;
 	void setPiece(Piece* piece, const Position pos);
 	Piece* getPieceAtPos(const Position pos) const;
 	void calculateSquares();

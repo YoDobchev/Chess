@@ -51,7 +51,7 @@ void Pawn::setAttackedSquares(Board* board) const {
 void King::setAttackedSquares(Board* board) const {
 	const Direction kingMoves[] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
 		Position next = pos;
 		next.move(kingMoves[i]);
 		if (!next.isOutOfBounds()) {
@@ -86,7 +86,7 @@ void Pawn::calculateValidMoves(Board* board) {
 		if (targetPiece && targetPiece->getColor() != color) {
 			validMoves.push_back(capturePos);
 		}
-		if (capturePos == board->enPassantSquare) {
+		if (capturePos == board->getEnPassantSquare()) {
 			validMoves.push_back(capturePos);
 		}
 	}
@@ -156,7 +156,7 @@ void Knight::calculateValidMoves(Board* board) {
 	attackingMoves.clear();
 	const Direction knightMoves[] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
 
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
 		Position next = pos;
 		next.move(knightMoves[i]);
 		if (!next.isOutOfBounds()) {
@@ -189,7 +189,7 @@ void King::calculateValidMoves(Board* board) {
 	attackingMoves.clear();
 	const Direction kingMoves[] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < BOARD_SIZE; ++i) {
 		Position next = pos;
 		next.move(kingMoves[i]);
 		if (!next.isOutOfBounds()) {
@@ -244,14 +244,14 @@ void Piece::move(const Position to, Board* board, String& error) {
 void Pawn::move(const Position to, Board* board, String& error) {
 	const int direction = (color == Player::WHITE) ? 1 : -1;
 	if (to.row == pos.row + direction * 2) {
-		board->enPassantSquare = {pos.row + direction, pos.col};
+		board->setEnPassantSquare({pos.row + direction, pos.col});
 	}
 
 	const int colOffsets[2] = {-1, 1};
 	for (int i = 0; i < 2; ++i) {
 		Position capturePos = {pos.row + direction, pos.col + colOffsets[i]};
 		if (capturePos.isOutOfBounds()) continue;
-		if (capturePos == board->oldEnPassantSquare) {
+		if (capturePos == board->getEnPassantSquare()) {
 			Position enPassantCapturePos = {to.row - direction, to.col};
 			(*board)[enPassantCapturePos.row][enPassantCapturePos.col].setPiece(nullptr);
 		}
@@ -282,7 +282,7 @@ void King::move(const Position to, Board* board, String& error) {
 	Piece::move(to, board, error);
 }
 
-char Pawn::serialize() const { return (color == Player::WHITE) ? 'p' : 'P' ; }
+char Pawn::serialize() const { return (color == Player::WHITE) ? 'p' : 'P'; }
 char Rook::serialize() const { return (color == Player::WHITE) ? 'r' : 'R'; }
 char Bishop::serialize() const { return (color == Player::WHITE) ? 'b' : 'B'; }
 char Knight::serialize() const { return (color == Player::WHITE) ? 'n' : 'N'; }

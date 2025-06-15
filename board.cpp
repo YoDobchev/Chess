@@ -97,6 +97,10 @@ String Board::serialize() const {
 	return result;
 }
 
+void Board::setEnPassantSquare(const Position pos) { enPassantSquare = pos; }
+
+Position Board::getEnPassantSquare() const { return enPassantSquare; }
+
 void Board::setPiece(Piece* piece, const Position pos) {
 	if (pos.isOutOfBounds()) return;
 	board[pos.row][pos.col].setPiece(piece);
@@ -173,7 +177,7 @@ bool Board::movePiece(const Position from, const Position to, const Player playe
 	}
 
 	oldEnPassantSquare = enPassantSquare;
-	if (enPassantSquare.row != -1) enPassantSquare = {-1, -1};
+	if (enPassantSquare.row != -1) setEnPassantSquare({-1, -1});
 
 	pieceToMove->move(to, this, error);
 
