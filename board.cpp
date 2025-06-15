@@ -137,7 +137,7 @@ void Board::calculateSquares() {
 			if (!piece) continue;
 
 			piece->setIsPinned(false);
-			piece->calculateValidMoves(this);
+			piece->updateMoves(this);
 			piece->setAttackedSquares(this);
 			if (checkExists != -1)
 				piece->removeValidMovesThatDoNotProtectKing(this->positionsToBlockCheck, this->checkExists);
@@ -153,7 +153,7 @@ void Board::calculateSquares() {
 			piece->removeValidMovesIfPinned();
 
 			if (King* king = dynamic_cast<King*>(piece)) {
-				king->calculateValidMoves(this);
+				king->updateMoves(this);
 			}
 		}
 	}

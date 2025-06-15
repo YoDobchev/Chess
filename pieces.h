@@ -26,7 +26,7 @@ class Piece {
 	void setHasMoved(bool moved);
 	void setIsPinned(bool value);
 	void setPosition(Position newPos);
-	virtual void calculateValidMoves(Board* board) = 0;
+	virtual void calculateMoves(Board* board) = 0;
 	void removeValidMovesIfPinned();
 	bool checkIfValidMove(const Position to, const Board* board);
 	void removeValidMovesThatDoNotProtectKing(const Vector<Position>& positionsThatCanBlock, const int checkExists);
@@ -43,7 +43,7 @@ class Pawn : public Piece {
 	String getEmoji() const override;
 	char serialize() const override;
 
-	void calculateValidMoves(Board* board) override;
+	void calculateMoves(Board* board) override;
 	void setAttackedSquares(Board* board) const override;
 	void move(const Position to, Board* board) override;
 };
@@ -54,7 +54,7 @@ class Rook : public Piece {
 	String getEmoji() const override;
 	char serialize() const override;
 
-	void calculateValidMoves(Board* board) override;
+	void calculateMoves(Board* board) override;
 	using Piece::move;
 	using Piece::setAttackedSquares;
 };
@@ -65,7 +65,7 @@ class Bishop : public Piece {
 	String getEmoji() const override;
 	char serialize() const override;
 
-	void calculateValidMoves(Board* board) override;
+	void calculateMoves(Board* board) override;
 	using Piece::move;
 	using Piece::setAttackedSquares;
 };
@@ -76,7 +76,7 @@ class Knight : public Piece {
 	String getEmoji() const override;
 	char serialize() const override;
 
-	void calculateValidMoves(Board* board) override;
+	void calculateMoves(Board* board) override;
 	using Piece::move;
 	using Piece::setAttackedSquares;
 };
@@ -87,7 +87,7 @@ class Queen : public Piece {
 	String getEmoji() const override;
 	char serialize() const override;
 
-	void calculateValidMoves(Board* board) override;
+	void calculateMoves(Board* board) override;
 	using Piece::move;
 	using Piece::setAttackedSquares;
 };
@@ -105,7 +105,7 @@ class King : public Piece {
 	bool canCastleLong(Board* board, int backrank) const;
 	bool canCastleShort(Board* board, int backrank) const;
 
-	void calculateValidMoves(Board* board) override;
+	void calculateMoves(Board* board) override;
 	void setAttackedSquares(Board* board) const override;
 	void move(const Position to, Board* board) override;
 };

@@ -78,7 +78,7 @@ void King::setAttackedSquares(Board* board) const {
 	}
 }
 
-void Pawn::calculateValidMoves(Board* board) {
+void Pawn::calculateMoves(Board* board) {
 	validMoves.clear();
 	attackingMoves.clear();
 	const int direction = (color == Player::WHITE) ? 1 : -1;
@@ -207,7 +207,7 @@ void Piece::addValidMovesBasedOnDirections(Board* board, const Vector<Direction>
 	detectIfMoveAllowedInDirections(board, directions);
 }
 
-void Rook::calculateValidMoves(Board* board) {
+void Rook::calculateMoves(Board* board) {
 	validMoves.clear();
 	attackingMoves.clear();
 	Vector<Direction> directions;
@@ -218,7 +218,7 @@ void Rook::calculateValidMoves(Board* board) {
 	addValidMovesBasedOnDirections(board, directions);
 }
 
-void Bishop::calculateValidMoves(Board* board) {
+void Bishop::calculateMoves(Board* board) {
 	validMoves.clear();
 	attackingMoves.clear();
 	Vector<Direction> directions;
@@ -229,7 +229,7 @@ void Bishop::calculateValidMoves(Board* board) {
 	addValidMovesBasedOnDirections(board, directions);
 }
 
-void Knight::calculateValidMoves(Board* board) {
+void Knight::calculateMoves(Board* board) {
 	validMoves.clear();
 	attackingMoves.clear();
 	const Direction knightMoves[] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
@@ -247,7 +247,7 @@ void Knight::calculateValidMoves(Board* board) {
 	}
 }
 
-void Queen::calculateValidMoves(Board* board) {
+void Queen::calculateMoves(Board* board) {
 	validMoves.clear();
 	attackingMoves.clear();
 	Vector<Direction> directions;
@@ -292,7 +292,7 @@ bool King::canCastleShort(Board* board, int backrank) const {
 	return true;
 }
 
-void King::calculateValidMoves(Board* board) {
+void King::calculateMoves(Board* board) {
 	validMoves.clear();
 	attackingMoves.clear();
 	const Direction kingMoves[] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
