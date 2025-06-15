@@ -1,21 +1,17 @@
 #include "Types.h"
 
-bool Position::operator==(const Position& other) const {
-    return (this->row == other.row && this->col == other.col);
-}
+bool Position::operator==(const Position& other) const { return (this->row == other.row && this->col == other.col); }
 
-bool Position::operator!=(const Position& other) const {
-    return !(*this == other);
-}
+bool Position::operator!=(const Position& other) const { return !(*this == other); }
 
 Position& Position::move(Direction dir) {
-    this->row += dir.dRow;
-    this->col += dir.dCol;
-    return *this;
+	this->row += dir.dRow;
+	this->col += dir.dCol;
+	return *this;
 }
 
 bool Position::isOutOfBounds() const {
-    return this->row < 0 || this->row >= BOARD_SIZE || this->col < 0 || this->col >= BOARD_SIZE;
+	return this->row < 0 || this->row >= BOARD_SIZE || this->col < 0 || this->col >= BOARD_SIZE;
 }
 
 Player operator!(Player p) { return (p == Player::WHITE) ? Player::BLACK : Player::WHITE; }

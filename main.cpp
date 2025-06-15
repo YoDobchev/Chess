@@ -1,7 +1,7 @@
 #include "GameState.h"
 
 int main() {
-    GameState newGame;
-    newGame.start();
-    return 0;
+	GameState newGame;
+	newGame.start();
+	return 0;
 }
