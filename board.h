@@ -39,6 +39,7 @@ class Board {
 
 	void setEnPassantSquare(const Position pos);
 	Position getEnPassantSquare() const;
+	Position getOldEnPassantSquare() const;
 	void setPiece(Piece* piece, const Position pos);
 	Piece* getPieceAtPos(const Position pos) const;
 	void calculateSquares();

@@ -251,7 +251,7 @@ void Pawn::move(const Position to, Board* board, String& error) {
 	for (int i = 0; i < 2; ++i) {
 		Position capturePos = {pos.row + direction, pos.col + colOffsets[i]};
 		if (capturePos.isOutOfBounds()) continue;
-		if (capturePos == board->getEnPassantSquare()) {
+		if (capturePos == board->getOldEnPassantSquare()) {
 			Position enPassantCapturePos = {to.row - direction, to.col};
 			(*board)[enPassantCapturePos.row][enPassantCapturePos.col].setPiece(nullptr);
 		}

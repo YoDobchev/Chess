@@ -100,6 +100,7 @@ String Board::serialize() const {
 void Board::setEnPassantSquare(const Position pos) { enPassantSquare = pos; }
 
 Position Board::getEnPassantSquare() const { return enPassantSquare; }
+Position Board::getOldEnPassantSquare() const { return oldEnPassantSquare; }
 
 void Board::setPiece(Piece* piece, const Position pos) {
 	if (pos.isOutOfBounds()) return;
