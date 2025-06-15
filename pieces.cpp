@@ -104,7 +104,7 @@ void Pawn::calculateValidMoves(Board* board) {
 		if (targetPiece && targetPiece->getColor() != color) {
 			validMoves.push_back(capturePos);
 		}
-		if (capturePos == board->getEnPassantSquare()) {
+		if (capturePos == board->getEnPassantSquare() && pos.row != startRow) {
 			validMoves.push_back(capturePos);
 		}
 	}
