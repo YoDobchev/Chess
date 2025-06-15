@@ -237,7 +237,7 @@ void King::calculateValidMoves(Board* board) {
 	canShortCastle = false;
 	canLongCastle = false;
 	const int backrank = (color == Player::WHITE) ? 0 : 7;
-	if (pos.row == backrank && pos.col == 4 && !hasMoved && !board->getCheckExists()) {
+	if (pos.row == backrank && pos.col == 4 && !hasMoved && board->getCheckExists() != static_cast<int>(color)) {
         if (canCastleLong(board, backrank)) {
             validMoves.push_back({backrank, 2});
             attackingMoves.push_back({backrank, 2});

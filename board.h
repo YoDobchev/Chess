@@ -27,6 +27,7 @@ class Square {
 class Board {
   private:
 	Square board[BOARD_SIZE][BOARD_SIZE];
+	// -1 - no check, 0 - white in check, 1 - black in check
 	int checkExists;
 	// Used for clearing the en passant square after a move
 	Position enPassantSquare, oldEnPassantSquare;
