@@ -1,6 +1,4 @@
 #include "GameState.h"
-#include "String.h"
-#include "Types.h"
 
 GameState::GameState() : playerTurn(Player::WHITE), gameOver(false) { board = new Board(); }
 
@@ -110,7 +108,6 @@ void GameState::executeCommand(const String& inputStr) {
 		String filename;
 		InputHandler::token(filename, inputStr, p);
 
-		std::cout << board->serialize() << std::endl;
 		String fullPath = "./savefiles/" + filename + ".save";
 		std::ofstream outFile(fullPath.c_str(), std::ios::out);
 		if (!outFile) {

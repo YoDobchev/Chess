@@ -1,6 +1,5 @@
 #include "Pieces.h"
 #include "Board.h"
-#include "Types.h"
 
 Piece::Piece(Player color) : color(color), hasMoved(false) {}
 
@@ -19,43 +18,6 @@ bool Piece::checkIfValidMove(const Position to, const Board* board, String& erro
 		if (validMoves[i] == to) return true;
 	}
 	return false;
-}
-
-void Piece::addValidMovesBasedOnDirections(const Board* board, const Vector<Direction>& directions) {
-	validMoves.clear();
-	for (int i = 0; i < directions.size(); ++i) {
-		Position next = pos;
-		while (true) {
-			next.move(directions[i]);
-			if (next.isOutOfBounds()) break;
-
-			Piece* targetPiece = board->getPieceAtPos(next);
-			if (targetPiece == nullptr) {
-				validMoves.push_back(next);
-				attackingMoves.push_back(next);
-				continue;
-			}
-
-			if (targetPiece->getColor() != color) {
-				validMoves.push_back(next);
-			} else {
-				attackingMoves.push_back(next);
-			}
-
-			King* king = dynamic_cast<King*>(targetPiece);
-			if (king != nullptr) {
-				attackingMoves.push_back(next);
-
-				Position oneOver = next;
-				oneOver.move(directions[i]);
-				if (!oneOver.isOutOfBounds()) {
-					attackingMoves.push_back(oneOver);
-				}
-			}
-
-			break;
-		}
-	}
 }
 
 void Piece::setAttackedSquares(Board* board) const {
@@ -98,18 +60,6 @@ void King::setAttackedSquares(Board* board) const {
 	}
 }
 
-String Pawn::getEmoji() const { return color == Player::WHITE ? "♙" : "♟"; }
-
-String Rook::getEmoji() const { return color == Player::WHITE ? "♖" : "♜"; }
-
-String Bishop::getEmoji() const { return color == Player::WHITE ? "♗" : "♝"; }
-
-String Knight::getEmoji() const { return color == Player::WHITE ? "♘" : "♞"; }
-
-String Queen::getEmoji() const { return color == Player::WHITE ? "♕" : "♛"; }
-
-String King::getEmoji() const { return color == Player::WHITE ? "♔" : "♚"; }
-
 void Pawn::calculateValidMoves(Board* board) {
 	validMoves.clear();
 	attackingMoves.clear();
@@ -138,6 +88,43 @@ void Pawn::calculateValidMoves(Board* board) {
 		}
 		if (capturePos == board->enPassantSquare) {
 			validMoves.push_back(capturePos);
+		}
+	}
+}
+
+void Piece::addValidMovesBasedOnDirections(const Board* board, const Vector<Direction>& directions) {
+	validMoves.clear();
+	for (int i = 0; i < directions.size(); ++i) {
+		Position next = pos;
+		while (true) {
+			next.move(directions[i]);
+			if (next.isOutOfBounds()) break;
+
+			Piece* targetPiece = board->getPieceAtPos(next);
+			if (targetPiece == nullptr) {
+				validMoves.push_back(next);
+				attackingMoves.push_back(next);
+				continue;
+			}
+
+			if (targetPiece->getColor() != color) {
+				validMoves.push_back(next);
+			} else {
+				attackingMoves.push_back(next);
+			}
+
+			King* king = dynamic_cast<King*>(targetPiece);
+			if (king != nullptr) {
+				attackingMoves.push_back(next);
+
+				Position oneOver = next;
+				oneOver.move(directions[i]);
+				if (!oneOver.isOutOfBounds()) {
+					attackingMoves.push_back(oneOver);
+				}
+			}
+
+			break;
 		}
 	}
 }
@@ -301,3 +288,10 @@ char Bishop::serialize() const { return (color == Player::WHITE) ? 'b' : 'B'; }
 char Knight::serialize() const { return (color == Player::WHITE) ? 'n' : 'N'; }
 char Queen::serialize() const { return (color == Player::WHITE) ? 'q' : 'Q'; }
 char King::serialize() const { return (color == Player::WHITE) ? 'k' : 'K'; }
+
+String Pawn::getEmoji() const { return color == Player::WHITE ? "♙" : "♟"; }
+String Rook::getEmoji() const { return color == Player::WHITE ? "♖" : "♜"; }
+String Bishop::getEmoji() const { return color == Player::WHITE ? "♗" : "♝"; }
+String Knight::getEmoji() const { return color == Player::WHITE ? "♘" : "♞"; }
+String Queen::getEmoji() const { return color == Player::WHITE ? "♕" : "♛"; }
+String King::getEmoji() const { return color == Player::WHITE ? "♔" : "♚"; }
