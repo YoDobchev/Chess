@@ -28,6 +28,8 @@ struct Position {
 	bool isOutOfBounds() const;
 };
 
+const int NO_CHECK = -1;
+
 enum class Player { WHITE, BLACK };
 
 Player operator!(Player p);

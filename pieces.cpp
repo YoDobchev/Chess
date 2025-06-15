@@ -1,7 +1,7 @@
 #include "Pieces.h"
 #include "Board.h"
 
-Piece::Piece(Player color) : color(color), hasMoved(false) {}
+Piece::Piece(Player color) : color(color), hasMoved(false), isPinned(false) {}
 
 Player Piece::getColor() const { return color; }
 
@@ -11,6 +11,8 @@ bool Piece::getHasMoved() const { return hasMoved; }
 
 void Piece::setHasMoved(bool moved) { hasMoved = moved; }
 
+void Piece::setIsPinned(bool value) { isPinned = value; }
+
 void Piece::setPosition(Position newPos) { pos = newPos; }
 
 bool Piece::checkIfValidMove(const Position to, const Board* board) {
@@ -18,6 +20,22 @@ bool Piece::checkIfValidMove(const Position to, const Board* board) {
 		if (validMoves[i] == to) return true;
 	}
 	return false;
+}
+
+void Piece::removeValidMovesThatDoNotProtectKing(const Vector<Position>& positionsThatCanBlock, const int checkExists) {
+	if (static_cast<int>(color) != (checkExists)) return;
+
+	Vector<Position> filtered;
+	for (int i = 0; i < validMoves.size(); ++i) {
+		for (int j = 0; j < positionsThatCanBlock.size(); ++j) {
+			if (validMoves[i] == positionsThatCanBlock[j]) {
+				filtered.push_back(validMoves[i]);
+				break;
+			}
+		}
+	}
+
+	validMoves = std::move(filtered);
 }
 
 void Piece::setAttackedSquares(Board* board) const {
@@ -92,13 +110,63 @@ void Pawn::calculateValidMoves(Board* board) {
 	}
 }
 
-void Piece::addValidMovesBasedOnDirections(const Board* board, const Vector<Direction>& directions) {
+void Piece::detectIfMoveAllowedInDirections(Board* board, const Vector<Direction>& directions) {
 	for (int i = 0; i < directions.size(); ++i) {
+		Vector<Position> positionsInThisDir;
 		Position next = pos;
+		bool sawEnemyKing = false;
+		while (true) {
+			// Get up to king
+			next.move(directions[i]);
+			if (next.isOutOfBounds()) break;
+			positionsInThisDir.push_back(next);
+			Piece* targetPiece = board->getPieceAtPos(next);
+			if (targetPiece == nullptr) continue;
+			King* king = dynamic_cast<King*>(targetPiece);
+			if (king != nullptr && king->getColor() != color) {
+				sawEnemyKing = true;
+				break;
+			};
+		}
+
+		if (!sawEnemyKing) continue;
+
+		int piecesBetweenAttackerAndKing = 0;
+		Piece* pieceInBetween = nullptr;
+		for (int i = 0; i < positionsInThisDir.size(); ++i) {
+			Piece* piece = board->getPieceAtPos(positionsInThisDir[i]);
+
+			if (!piece) continue;
+
+			if (dynamic_cast<King*>(piece) != nullptr) break;
+			++piecesBetweenAttackerAndKing;
+			if (piecesBetweenAttackerAndKing == 1) {
+				pieceInBetween = piece;
+			} else {
+				pieceInBetween = nullptr;
+				break;
+			}
+		}
+
+		if (piecesBetweenAttackerAndKing == 1 && pieceInBetween) {
+			std::cout << "Piece at " << pieceInBetween->pos.row << " " << pieceInBetween->pos.col << " is pinned!\n";
+			pieceInBetween->setIsPinned(true);
+		}
+	}
+}
+
+void Piece::addValidMovesBasedOnDirections(Board* board, const Vector<Direction>& directions) {
+	for (int i = 0; i < directions.size(); ++i) {
+		bool kingInSight = false;
+		Vector<Position> positionsInThisDir;
+		Position next = pos;
+		// Add the position of the piece that is attacking to the possible defences
+		positionsInThisDir.push_back(pos);
 		while (true) {
 			next.move(directions[i]);
 			if (next.isOutOfBounds()) break;
 
+			positionsInThisDir.push_back(next);
 			Piece* targetPiece = board->getPieceAtPos(next);
 			if (targetPiece == nullptr) {
 				validMoves.push_back(next);
@@ -113,8 +181,9 @@ void Piece::addValidMovesBasedOnDirections(const Board* board, const Vector<Dire
 			}
 
 			King* king = dynamic_cast<King*>(targetPiece);
-			if (king != nullptr) {
+			if (king != nullptr && king->getColor() != color) {
 				attackingMoves.push_back(next);
+				kingInSight = true;
 
 				Position oneOver = next;
 				oneOver.move(directions[i]);
@@ -125,7 +194,17 @@ void Piece::addValidMovesBasedOnDirections(const Board* board, const Vector<Dire
 
 			break;
 		}
+
+		if (kingInSight) {
+			for (int i = 0; i < positionsInThisDir.size() - 1; ++i) {
+				board->addToPositionsToBlockCheck(positionsInThisDir[i]);
+			}
+		}
+
+		positionsInThisDir.clear();
 	}
+
+	detectIfMoveAllowedInDirections(board, directions);
 }
 
 void Rook::calculateValidMoves(Board* board) {
@@ -257,6 +336,10 @@ void King::calculateValidMoves(Board* board) {
 			++i;
 		}
 	}
+}
+
+void Piece::removeValidMovesIfPinned() {
+	if (isPinned) validMoves.clear();
 }
 
 void Piece::move(const Position to, Board* board) {

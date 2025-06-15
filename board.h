@@ -3,6 +3,7 @@
 
 #include "String.h"
 #include "Types.h"
+#include "Vector.h"
 
 class Piece;
 
@@ -29,6 +30,7 @@ class Board {
 	Square board[BOARD_SIZE][BOARD_SIZE];
 	// -1 - no check, 0 - white in check, 1 - black in check
 	int checkExists;
+	Vector<Position> positionsToBlockCheck;
 	// Used for clearing the en passant square after a move
 	Position enPassantSquare, oldEnPassantSquare;
 
@@ -48,6 +50,8 @@ class Board {
 	void clearAttackedSquares();
 	void setCheckExists(int exists);
 	int getCheckExists() const;
+	Vector<Position>& getPositionsToBlockCheck();
+	void addToPositionsToBlockCheck(const Position pos);
 	bool movePiece(const Position from, const Position to, const Player playerTurn, String& error);
 };
 

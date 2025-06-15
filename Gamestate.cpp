@@ -184,24 +184,43 @@ void GameState::executeCommand(const String& inputStr) {
 }
 
 bool GameState::hasGameEnded() {
-	bool stalemate = true;
-	bool checkmate = false;
-	bool repetition = false;
+	bool onlyKings = true;
 	for (int i = 0; i < BOARD_SIZE; ++i) {
 		for (int j = 0; j < BOARD_SIZE; ++j) {
 			Piece* piece = (*board)[i][j].getPiece();
-			if (!piece) continue;
+			if (piece && dynamic_cast<King*>(piece) == nullptr) {
+				onlyKings = false;
+				break;
+			}
+		}
+		if (!onlyKings) break;
+	}
+	if (onlyKings) {
+		printBoard();
+		std::cout << "Stalemate! The game is a draw!" << std::endl;
+		return true;
+	}
 
-			if (King* king = dynamic_cast<King*>(piece)) {
-				if ((*board).getCheckExists() != -1 && king->getValidMoves().size() == 0) {
-					checkmate = true;
-				}
-			} else {
-				stalemate = false;
+	bool inCheck = (board->getCheckExists() == static_cast<int>(playerTurn));
+	bool hasLegalMoves = false;
+
+	for (int i = 0; i < BOARD_SIZE && !hasLegalMoves; ++i) {
+		for (int j = 0; j < BOARD_SIZE; ++j) {
+			Piece* piece = (*board)[i][j].getPiece();
+			if (piece && piece->getColor() == playerTurn && !piece->getValidMoves().empty()) {
+				hasLegalMoves = true;
+				break;
 			}
 		}
 	}
 
+	if (inCheck && !hasLegalMoves) {
+		printBoard();
+		std::cout << "Checkmate! " << !playerTurn << " wins!" << std::endl;
+		return true;
+	}
+
+	bool repetition = false;
 	if (lastSixMoves.size() == 6) {
 		repetition = true;
 		const String& W1 = lastSixMoves[0];
@@ -217,19 +236,8 @@ bool GameState::hasGameEnded() {
 		repetition = whiteRep && blackRep;
 	}
 
-	if (checkmate || stalemate || repetition) printBoard();
-
-	if (checkmate) {
-		std::cout << "Checkmate! " << !playerTurn << " wins!" << std::endl;
-		return true;
-	}
-
-	if (stalemate) {
-		std::cout << "Stalemate! The game is a draw!" << std::endl;
-		return true;
-	}
-
 	if (repetition) {
+		printBoard();
 		std::cout << "Draw by repetition!" << std::endl;
 		return true;
 	}

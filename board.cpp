@@ -109,6 +109,13 @@ void Board::setEnPassantSquare(const Position pos) { enPassantSquare = pos; }
 Position Board::getEnPassantSquare() const { return enPassantSquare; }
 Position Board::getOldEnPassantSquare() const { return oldEnPassantSquare; }
 
+Vector<Position>& Board::getPositionsToBlockCheck() { return positionsToBlockCheck; }
+
+void Board::addToPositionsToBlockCheck(const Position pos) {
+	if (pos.isOutOfBounds()) return;
+	positionsToBlockCheck.push_back(pos);
+}
+
 void Board::setPiece(Piece* piece, const Position pos) {
 	if (pos.isOutOfBounds()) return;
 	board[pos.row][pos.col].setPiece(piece);
@@ -129,16 +136,21 @@ void Board::calculateSquares() {
 			Piece* piece = board[i][j].getPiece();
 			if (!piece) continue;
 
+			piece->setIsPinned(false);
 			piece->calculateValidMoves(this);
 			piece->setAttackedSquares(this);
+			if (checkExists != -1)
+				piece->removeValidMovesThatDoNotProtectKing(this->positionsToBlockCheck, this->checkExists);
 		}
 	}
 
-	// Calculate valid moves for both kings again
+	// Calculate valid moves for both kings again & update valid moves based on pinned
 	for (int i = 0; i < BOARD_SIZE; ++i) {
 		for (int j = 0; j < BOARD_SIZE; ++j) {
 			Piece* piece = board[i][j].getPiece();
 			if (!piece) continue;
+
+			piece->removeValidMovesIfPinned();
 
 			if (King* king = dynamic_cast<King*>(piece)) {
 				king->calculateValidMoves(this);
@@ -156,20 +168,19 @@ void Board::clearAttackedSquares() {
 }
 
 bool Board::movePiece(const Position from, const Position to, const Player playerTurn, String& error) {
-
 	Piece* pieceToMove = getPieceAtPos(from);
 	if (!pieceToMove) {
 		error = "No piece at the from position!";
 		return false;
 	}
 
-	if (checkExists == static_cast<int>(playerTurn) && dynamic_cast<King*>(pieceToMove) == nullptr) {
-		error = "You cannot move a piece while in check!";
+	if (pieceToMove->getColor() != playerTurn) {
+		error = "It's not your turn!";
 		return false;
 	}
 
-	if (pieceToMove->getColor() != playerTurn) {
-		error = "It's not your turn!";
+	if (!pieceToMove->checkIfValidMove(to, this)) {
+		error = "Invalid move spot!";
 		return false;
 	}
 
@@ -179,17 +190,13 @@ bool Board::movePiece(const Position from, const Position to, const Player playe
 		return false;
 	}
 
-	if (!pieceToMove->checkIfValidMove(to, this)) {
-		error = "Invalid move spot!";
-		return false;
-	}
-
 	oldEnPassantSquare = enPassantSquare;
 	if (enPassantSquare.row != -1) setEnPassantSquare({-1, -1});
 
 	pieceToMove->move(to, this);
 
-	setCheckExists(-1);
+	setCheckExists(NO_CHECK);
+	positionsToBlockCheck.clear();
 
 	clearAttackedSquares();
 

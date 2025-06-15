@@ -12,9 +12,10 @@ class Piece {
 	Player color;
 	Position pos;
 	Vector<Position> validMoves, attackingMoves;
-	bool hasMoved;
+	bool hasMoved, isPinned;
 
-	void addValidMovesBasedOnDirections(const Board* board, const Vector<Direction>& directions);
+	void addValidMovesBasedOnDirections(Board* board, const Vector<Direction>& directions);
+	void detectIfMoveAllowedInDirections(Board* board, const Vector<Direction>& directions);
 
   public:
 	Piece(Player color);
@@ -23,13 +24,16 @@ class Piece {
 	const Vector<Position>& getValidMoves() const;
 	bool getHasMoved() const;
 	void setHasMoved(bool moved);
+	void setIsPinned(bool value);
 	void setPosition(Position newPos);
-	virtual String getEmoji() const = 0;
 	virtual void calculateValidMoves(Board* board) = 0;
-	virtual char serialize() const = 0;
+	void removeValidMovesIfPinned();
 	bool checkIfValidMove(const Position to, const Board* board);
+	void removeValidMovesThatDoNotProtectKing(const Vector<Position>& positionsThatCanBlock, const int checkExists);
 	virtual void setAttackedSquares(Board* board) const;
 	virtual void move(const Position to, Board* board);
+	virtual char serialize() const = 0;
+	virtual String getEmoji() const = 0;
 };
 
 class Pawn : public Piece {
