@@ -98,6 +98,9 @@ class King : public Piece {
 	String getEmoji() const override;
 	char serialize() const override;
 
+	bool canCastleLong(Board* board, int backrank) const;
+	bool canCastleShort(Board* board, int backrank) const;
+
 	void calculateValidMoves(Board* board) override;
 	void setAttackedSquares(Board* board) const override;
 	void move(const Position to, Board* board, String& error) override;

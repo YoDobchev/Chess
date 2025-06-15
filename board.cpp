@@ -1,14 +1,21 @@
 #include "Board.h"
 #include "Pieces.h"
 
-Square::Square() : piece(nullptr), specialColor(0) {}
-Square::~Square() { piece = nullptr; }
+Square::Square() : piece(nullptr), specialColor(0) {
+	isAttackedBy[0] = false;
+	isAttackedBy[1] = false;
+}
+
+Square::~Square() { delete piece; }
 
 int Square::getSpecialColor() const { return specialColor; }
 
 void Square::setSpecialColor(const int color) { specialColor = color; }
 
-void Square::setPiece(Piece* piece) { this->piece = piece; }
+void Square::setPiece(Piece* piece) {
+	if (this->piece != nullptr && piece != nullptr) delete this->piece;
+	this->piece = piece;
+}
 
 bool Square::getAttackedBy(Player player) const { return isAttackedBy[static_cast<int>(player)]; }
 
@@ -46,7 +53,7 @@ Board::Board() : enPassantSquare({-1, -1}), checkExists(-1) {
 	calculateSquares();
 }
 
-Board::Board(const String& serializedData) : enPassantSquare({-1, -1}), checkExists(-1) {
+Board::Board(const String& serializedData) : enPassantSquare({-1, -1}), oldEnPassantSquare({-1, -1}), checkExists(-1) {
 	for (int i = 0; i < BOARD_SIZE; ++i) {
 		for (int j = 0; j < BOARD_SIZE; ++j) {
 			char pieceChar = serializedData[i * 9 + j];

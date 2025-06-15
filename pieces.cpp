@@ -93,7 +93,6 @@ void Pawn::calculateValidMoves(Board* board) {
 }
 
 void Piece::addValidMovesBasedOnDirections(const Board* board, const Vector<Direction>& directions) {
-	validMoves.clear();
 	for (int i = 0; i < directions.size(); ++i) {
 		Position next = pos;
 		while (true) {
@@ -184,6 +183,40 @@ void Queen::calculateValidMoves(Board* board) {
 	addValidMovesBasedOnDirections(board, directions);
 }
 
+static bool pathClear(Board* board, int row, int c1, int c2) {
+    for (int c = c1; c <= c2; ++c)
+        if (board->getPieceAtPos({row,c})) return false;
+    return true;
+}
+
+bool King::canCastleLong(Board* board, int backrank) const {
+    Piece* rook = board->getPieceAtPos({backrank, 0});
+    if (!rook || rook->getHasMoved()) return false;
+
+    if (!pathClear(board, backrank, 1, 3)) return false;
+
+    Player opp = !color;
+    if ( (*board)[backrank][3].getAttackedBy(opp) ||
+         (*board)[backrank][2].getAttackedBy(opp) )
+        return false;
+
+    return true;
+}
+
+bool King::canCastleShort(Board* board, int backrank) const {
+    Piece* rook = board->getPieceAtPos({backrank, 7});
+    if (!rook || rook->getHasMoved()) return false;
+
+    if (!pathClear(board, backrank, 5, 6)) return false;
+
+    Player opp = !color;
+    if ( (*board)[backrank][5].getAttackedBy(opp) ||
+         (*board)[backrank][6].getAttackedBy(opp) )
+        return false;
+
+    return true;
+}
+
 void King::calculateValidMoves(Board* board) {
 	validMoves.clear();
 	attackingMoves.clear();
@@ -201,26 +234,23 @@ void King::calculateValidMoves(Board* board) {
 		}
 	}
 
+	canShortCastle = false;
+	canLongCastle = false;
 	const int backrank = (color == Player::WHITE) ? 0 : 7;
-	if (pos.row == backrank && pos.col == 4 && !hasMoved) {
-		Piece* longCastlingRook = board->getPieceAtPos({backrank, 0});
-		Piece* shortCastlingRook = board->getPieceAtPos({backrank, 7});
-		if (longCastlingRook && !longCastlingRook->getHasMoved() && board->getPieceAtPos({backrank, 1}) == nullptr
-		    && board->getPieceAtPos({backrank, 2}) == nullptr && board->getPieceAtPos({backrank, 3}) == nullptr) {
-			validMoves.push_back(Position{backrank, 2});
-			attackingMoves.push_back(Position{backrank, 2});
-			canLongCastle = true;
-		}
-		if (shortCastlingRook && !shortCastlingRook->getHasMoved() && board->getPieceAtPos({backrank, 5}) == nullptr
-		    && board->getPieceAtPos({backrank, 6}) == nullptr) {
-			validMoves.push_back(Position{backrank, 6});
-			attackingMoves.push_back(Position{backrank, 6});
-			canShortCastle = true;
-		}
-	}
+	if (pos.row == backrank && pos.col == 4 && !hasMoved && !board->getCheckExists()) {
+        if (canCastleLong(board, backrank)) {
+            validMoves.push_back({backrank, 2});
+            attackingMoves.push_back({backrank, 2});
+            canLongCastle = true;
+        }
+        if (canCastleShort(board, backrank)) {
+            validMoves.push_back({backrank, 6});
+            attackingMoves.push_back({backrank, 6});
+            canShortCastle = true;
+        }
+    }
 
 	Player opponent = !color;
-
 	for (int i = 0; i < validMoves.size();) {
 		Position dest = validMoves[i];
 		bool attacked = (*board)[dest.row][dest.col].getAttackedBy(opponent);
@@ -253,6 +283,7 @@ void Pawn::move(const Position to, Board* board, String& error) {
 		if (capturePos.isOutOfBounds()) continue;
 		if (capturePos == board->getOldEnPassantSquare()) {
 			Position enPassantCapturePos = {to.row - direction, to.col};
+			delete board->getPieceAtPos(enPassantCapturePos);
 			(*board)[enPassantCapturePos.row][enPassantCapturePos.col].setPiece(nullptr);
 		}
 	}

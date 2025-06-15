@@ -186,19 +186,17 @@ bool GameState::hasGameEnded() {
 
 	if (lastSixMoves.size() == 6) {
 		repetition = true;
-		for (int i = 0; i < 3; ++i) {
-			const String& W1 = lastSixMoves[0];
-			const String& W2 = lastSixMoves[2];
-			const String& W3 = lastSixMoves[4];
-			bool whiteRep = (W1 == W3) && (W2 == Utility::invertMove(W1));
+		const String& W1 = lastSixMoves[0];
+		const String& W2 = lastSixMoves[2];
+		const String& W3 = lastSixMoves[4];
+		bool whiteRep = (W1 == W3) && (W2 == Utility::invertMove(W1));
 
-			const String& B1 = lastSixMoves[1];
-			const String& B2 = lastSixMoves[3];
-			const String& B3 = lastSixMoves[5];
-			bool blackRep = (B1 == B3) && (B2 == Utility::invertMove(B1));
+		const String& B1 = lastSixMoves[1];
+		const String& B2 = lastSixMoves[3];
+		const String& B3 = lastSixMoves[5];
+		bool blackRep = (B1 == B3) && (B2 == Utility::invertMove(B1));
 
-			repetition = whiteRep && blackRep;
-		}
+		repetition = whiteRep && blackRep;
 	}
 
 	if (checkmate || stalemate || repetition) printBoard();

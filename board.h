@@ -28,12 +28,13 @@ class Board {
   private:
 	Square board[BOARD_SIZE][BOARD_SIZE];
 	int checkExists;
+	// Used for clearing the en passant square after a move
 	Position enPassantSquare, oldEnPassantSquare;
 
   public:
-	// Used for clearing the en passant square after a move
 	Board();
 	Board(const String& serializedData);
+	~Board() = default;
 	Square* operator[](const int row);
 	String serialize() const;
 
@@ -46,8 +47,6 @@ class Board {
 	void clearAttackedSquares();
 	void setCheckExists(int exists);
 	int getCheckExists() const;
-	bool getCheckmate() const;
-	bool getStalemate() const;
 	bool movePiece(const Position from, const Position to, const Player playerTurn, String& error);
 };
 
