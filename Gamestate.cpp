@@ -1,5 +1,18 @@
 #include "GameState.h"
 
+#ifdef _WIN32
+#include <windows.h>
+void enableANSI() {
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD dwMode = 0;
+	GetConsoleMode(hOut, &dwMode);
+	dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	SetConsoleMode(hOut, dwMode);
+	SetConsoleOutputCP(CP_UTF8);
+	SetConsoleCP(CP_UTF8);
+}
+#endif
+
 GameState::GameState() : playerTurn(Player::WHITE), gameOver(false) { board = new Board(); }
 
 GameState::~GameState() { delete board; }
