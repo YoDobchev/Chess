@@ -196,11 +196,6 @@ bool GameState::hasGameEnded() {
 		}
 		if (!onlyKings) break;
 	}
-	if (onlyKings) {
-		printBoard();
-		std::cout << "Stalemate! The game is a draw!" << std::endl;
-		return true;
-	}
 
 	bool inCheck = (board->getCheckExists() == static_cast<int>(playerTurn));
 	bool hasLegalMoves = false;
@@ -218,6 +213,12 @@ bool GameState::hasGameEnded() {
 	if (inCheck && !hasLegalMoves) {
 		printBoard();
 		std::cout << "Checkmate! " << !playerTurn << " wins!" << std::endl;
+		return true;
+	}
+
+	if (!hasLegalMoves || onlyKings) {
+		printBoard();
+		std::cout << "Stalemate! The game is a draw!" << std::endl;
 		return true;
 	}
 
