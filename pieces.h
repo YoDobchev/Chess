@@ -11,8 +11,8 @@ class Piece {
   protected:
 	Player color;
 	Position pos;
-	Vector<Position> validMoves, attackingMoves;
-	bool hasMoved, isPinned;
+	Vector<Position> validMoves, attackingMoves, validMovesWhenPinned;
+	bool hasMoved;
 
 	void addValidMovesBasedOnDirections(Board* board, const Vector<Direction>& directions);
 	void detectIfMoveAllowedInDirections(Board* board, const Vector<Direction>& directions);
@@ -24,7 +24,7 @@ class Piece {
 	const Vector<Position>& getValidMoves() const;
 	bool getHasMoved() const;
 	void setHasMoved(bool moved);
-	void setIsPinned(bool value);
+	void clearPinnedPositions();
 	void setPosition(Position newPos);
 	virtual void calculateMoves(Board* board) = 0;
 	void removeValidMovesIfPinned();

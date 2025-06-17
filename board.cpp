@@ -140,7 +140,6 @@ void Board::calculateSquares() {
 			Piece* piece = board[i][j].getPiece();
 			if (!piece) continue;
 
-			piece->setIsPinned(false);
 			piece->calculateMoves(this);
 			piece->setAttackedSquares(this);
 		}
@@ -164,6 +163,7 @@ void Board::calculateSquares() {
 			if (!piece) continue;
 
 			piece->removeValidMovesIfPinned();
+			piece->clearPinnedPositions();
 
 			if (King* king = dynamic_cast<King*>(piece)) {
 				king->calculateMoves(this);

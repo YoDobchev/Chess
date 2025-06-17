@@ -1,7 +1,7 @@
 #include "Pieces.h"
 #include "Board.h"
 
-Piece::Piece(Player color) : color(color), hasMoved(false), isPinned(false) {}
+Piece::Piece(Player color) : color(color), hasMoved(false) {}
 
 Player Piece::getColor() const { return color; }
 
@@ -11,7 +11,7 @@ bool Piece::getHasMoved() const { return hasMoved; }
 
 void Piece::setHasMoved(bool moved) { hasMoved = moved; }
 
-void Piece::setIsPinned(bool value) { isPinned = value; }
+void Piece::clearPinnedPositions() { validMovesWhenPinned.clear(); }
 
 void Piece::setPosition(Position newPos) { pos = newPos; }
 
@@ -131,7 +131,7 @@ void Piece::detectIfMoveAllowedInDirections(Board* board, const Vector<Direction
 
 		if (!sawEnemyKing) continue;
 
-		int piecesBetweenAttackerAndKing = 0;
+		int piecesBetweenAttackerAndKing = 0, pieceIndexInVector;
 		Piece* pieceInBetween = nullptr;
 		for (int i = 0; i < positionsInThisDir.size(); ++i) {
 			Piece* piece = board->getPieceAtPos(positionsInThisDir[i]);
@@ -142,22 +142,28 @@ void Piece::detectIfMoveAllowedInDirections(Board* board, const Vector<Direction
 			++piecesBetweenAttackerAndKing;
 			if (piecesBetweenAttackerAndKing == 1) {
 				pieceInBetween = piece;
+				pieceIndexInVector = i;
 			} else {
 				pieceInBetween = nullptr;
 				break;
 			}
 		}
 
+		// Prevent the piece from attacking itself and the king
+		positionsInThisDir.erase(pieceIndexInVector);
+		positionsInThisDir.erase(positionsInThisDir.size() - 1);
+		positionsInThisDir.push_back(pos);
+
 		if (piecesBetweenAttackerAndKing == 1 && pieceInBetween) {
-			std::cout << "Piece at " << pieceInBetween->pos.row << " " << pieceInBetween->pos.col << " is pinned!\n";
-			pieceInBetween->setIsPinned(true);
+			pieceInBetween->validMovesWhenPinned = std::move(positionsInThisDir);
 		}
+		break;
 	}
 }
 
 void Piece::addValidMovesBasedOnDirections(Board* board, const Vector<Direction>& directions) {
 	for (int i = 0; i < directions.size(); ++i) {
-		bool kingInSight = false;
+		bool sawEnemyKing = false;
 		Vector<Position> positionsInThisDir;
 		Position next = pos;
 		// Add the position of the piece that is attacking to the possible defences
@@ -183,7 +189,7 @@ void Piece::addValidMovesBasedOnDirections(Board* board, const Vector<Direction>
 			King* king = dynamic_cast<King*>(targetPiece);
 			if (king != nullptr && king->getColor() != color) {
 				attackingMoves.push_back(next);
-				kingInSight = true;
+				sawEnemyKing = true;
 
 				Position oneOver = next;
 				oneOver.move(directions[i]);
@@ -195,7 +201,7 @@ void Piece::addValidMovesBasedOnDirections(Board* board, const Vector<Direction>
 			break;
 		}
 
-		if (kingInSight) {
+		if (sawEnemyKing) {
 			for (int i = 0; i < positionsInThisDir.size() - 1; ++i) {
 				board->addToPositionsToBlockCheck(positionsInThisDir[i]);
 			}
@@ -339,7 +345,20 @@ void King::calculateMoves(Board* board) {
 }
 
 void Piece::removeValidMovesIfPinned() {
-	if (isPinned) validMoves.clear();
+	if (!validMovesWhenPinned.empty()) {
+		for (int i = 0; i < validMoves.size();) {
+			bool isValidAfterFilter = false;
+			for (int j = 0; j < validMovesWhenPinned.size(); j++) {
+				if (validMoves[i] == validMovesWhenPinned[j]) isValidAfterFilter = true;
+			}
+
+			if (!isValidAfterFilter) {
+				validMoves.erase(i);
+			} else {
+				++i;
+			}
+		}
+	}
 }
 
 void Piece::move(const Position to, Board* board) {
