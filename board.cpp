@@ -29,7 +29,7 @@ void Square::clearAttackedBy() {
 
 Piece* Square::getPiece() const { return piece; }
 
-Board::Board() : enPassantSquare({-1, -1}), checkExists(-1) {
+Board::Board() : enPassantSquare({-1, -1}), oldEnPassantSquare({-1, -1}), checkExists(NO_CHECK) {
 	for (int i = 0; i < BOARD_SIZE; ++i) {
 		setPiece(new Pawn(Player::WHITE), {1, i});
 		setPiece(new Pawn(Player::BLACK), {6, i});
@@ -53,7 +53,8 @@ Board::Board() : enPassantSquare({-1, -1}), checkExists(-1) {
 	calculateSquares();
 }
 
-Board::Board(const String& serializedData) : enPassantSquare({-1, -1}), oldEnPassantSquare({-1, -1}), checkExists(-1) {
+Board::Board(const String& serializedData)
+    : enPassantSquare({-1, -1}), oldEnPassantSquare({-1, -1}), checkExists(NO_CHECK) {
 	for (int i = 0; i < BOARD_SIZE; ++i) {
 		for (int j = 0; j < BOARD_SIZE; ++j) {
 			char pieceChar = serializedData[i * 9 + j];
